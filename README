@@ -1,0 +1,127 @@
+# My Resume
+
+## About Me
+
+Hi, I am **Shahin Mansouri**, a developer interested in building practical web applications with Python and Django. I created this project to provide a clean, customizable platform for presenting professional experience, skills, projects, certificates, and contact information in one place.
+
+## About This Project
+
+**My Resume** is a multi-user resume and portfolio website built with Django. Users can create an account, complete their professional profile, and publish a personal CV with a public-facing presentation page.
+
+## Features
+
+- User registration, login, and profile management
+- Custom user accounts with phone number and address fields
+- Profile picture, professional title, and biography
+- Skills with proficiency levels
+- Work experience and the technologies used in each role
+- Projects grouped by field of activity
+- GitHub and live demo links for projects
+- Certificates with issuer, issue date, and verification links
+- Contact and messaging support
+- Django admin panel for content management
+- Media file handling for profile and project images
+
+## Built With
+
+- Python
+- Django 5.2
+- Django REST Framework
+- SQLite
+- Pillow
+- python-dotenv
+- HTML, CSS, and JavaScript
+
+## Project Structure
+
+```text
+account/     Authentication, users, profiles, skills, projects, and certificates
+home/        Main website pages
+index/       Public CV pages
+message/     Messaging functionality
+my_resume/   Django project configuration
+media/       Uploaded profile and project images
+```
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone <your-repository-url>
+cd resume-site-django
+```
+
+### 2. Create and activate a virtual environment
+
+Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+macOS or Linux:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure environment variables
+
+Create a `.env` file in the project root:
+
+```env
+SECRET_KEY=your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+```
+
+Keep the `.env` file private and do not commit production secrets.
+
+### 5. Apply migrations
+
+```bash
+python manage.py migrate
+```
+
+### 6. Create an administrator account
+
+```bash
+python manage.py createsuperuser
+```
+
+### 7. Start the development server
+
+```bash
+python manage.py runserver
+```
+
+Open `http://127.0.0.1:8000/` in your browser.
+
+## Main Routes
+
+| Route | Description |
+| --- | --- |
+| `/` | Home page |
+| `/cv/` | Public CV pages |
+| `/account/` | Account and dashboard pages |
+| `/messages/` | Messaging pages |
+| `/admin/` | Django administration |
+
+## Development Notes
+
+This project uses SQLite by default, which makes it convenient for local development. For production, configure a production-ready database, set `DEBUG=False`, define trusted hosts, and serve static and media files through a secure deployment setup.
+
+## Author
+
+Created and maintained by **Manso**.
+
+I am open to learning, improving this project, and building useful web experiences with modern development tools.

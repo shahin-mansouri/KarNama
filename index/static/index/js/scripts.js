@@ -162,27 +162,31 @@ window.addEventListener('scroll', () => {
 });
 
 // ---------- FORM ----------
-contactForm.addEventListener('submit', (e) => {
+contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const subject = document.getElementById('subject').value.trim();
-    const message = document.getElementById('message').value.trim();
-    if (!name || !email || !subject || !message) {
-    formMessage.textContent = 'لطفاً تمام فیلدها را پر کنید.';
-    formMessage.style.color = 'red';
-    return;
+    formMessage.textContent = 'در حال ارسال...';
+    formMessage.style.color = 'var(--text2)';
+
+    try {
+        const response = await fetch(contactForm.action, {
+            method: 'POST',
+            body: new FormData(contactForm),
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+        });
+        const result = await response.json();
+
+        if (!response.ok) {
+            const firstError = Object.values(result.errors || {})[0];
+            throw new Error(firstError?.[0]?.message || 'لطفاً اطلاعات فرم را بررسی کنید.');
+        }
+
+        formMessage.textContent = result.message;
+        formMessage.style.color = 'green';
+        contactForm.reset();
+    } catch (error) {
+        formMessage.textContent = error.message || 'ارسال پیام انجام نشد.';
+        formMessage.style.color = 'red';
     }
-    if (!email.includes('@')) {
-    formMessage.textContent = 'ایمیل معتبر وارد کنید.';
-    formMessage.style.color = 'red';
-    return;
-    }
-    formMessage.textContent = '✅ پیام شما با موفقیت ارسال شد! (شبیه‌سازی)';
-    formMessage.style.color = 'green';
-    contactForm.reset();
-    // In production: integrate with backend API
-    // fetch('/api/contact', { method: 'POST', body: JSON.stringify({name, email, subject, message}) })
 });
 
 // ---------- THEME EVENTS ----------

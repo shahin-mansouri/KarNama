@@ -39,6 +39,7 @@ class Index(TemplateView):
             })
 
         context['profile'] = profile
+        context['owner'] = owner
         context['portfolio_data'] = {
             'personal': {
                 'name': owner.get_full_name() or owner.username,

@@ -1,5 +1,7 @@
 from django.views.generic import TemplateView
 
+from account.models import UserCustom
+
 from .models import BlogPost
 
 
@@ -13,5 +15,19 @@ class Home(TemplateView):
             BlogPost.objects.filter(is_published=True)
             .values_list('category', flat=True)
             .distinct()[:6]
+        )
+        return context
+
+
+class ResumeBank(TemplateView):
+    template_name = "home/resume_bank.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['resume_users'] = (
+            UserCustom.objects
+            .filter(is_active=True, userprofile__isnull=False)
+            .select_related('userprofile')
+            .order_by('-date_joined')
         )
         return context

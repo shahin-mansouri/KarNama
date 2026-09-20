@@ -1,0 +1,53 @@
+{% extends 'home/base.html' %}
+
+{% block title %}بانک رزومه | کارنما{% endblock %}
+{% block meta_description %}رزومه‌های حرفه‌ای منتشرشده در کارنما را ببینید و با متخصصان آشنا شوید.{% endblock %}
+
+{% block content %}
+<main class="resume-bank-page">
+  <section class="resume-bank-hero">
+    <div class="home-container">
+      <span class="eyebrow">نمایش توانایی‌ها</span>
+      <h1>بانک رزومه</h1>
+      <p>رزومه‌های حرفه‌ای اعضای کارنما را ببینید و مسیر کاری افراد مختلف را کشف کنید.</p>
+    </div>
+  </section>
+
+  <section class="resume-bank-section">
+    <div class="home-container">
+      <div class="resume-bank-heading">
+        <div>
+          <span class="section-kicker">رزومه‌های منتشرشده</span>
+          <h2>آدم‌های پشت مسیرهای حرفه‌ای</h2>
+        </div>
+        <span class="resume-count">{{ resume_users|length }} رزومه</span>
+      </div>
+
+      <div class="resume-grid">
+        {% for resume_user in resume_users %}
+          <article class="resume-card">
+            <div class="resume-card-top">
+              {% if resume_user.userprofile.profile_picture %}
+                <img src="{{ resume_user.userprofile.profile_picture.url }}" alt="{{ resume_user.get_full_name|default:resume_user.username }}" class="resume-avatar">
+              {% else %}
+                <div class="resume-avatar resume-avatar-placeholder">{{ resume_user.first_name|default:resume_user.username|first|upper }}</div>
+              {% endif %}
+              <span class="resume-status">در دسترس</span>
+            </div>
+            <h3>{{ resume_user.get_full_name|default:resume_user.username }}</h3>
+            <p class="resume-title">{{ resume_user.userprofile.title }}</p>
+            <p class="resume-bio">{{ resume_user.userprofile.bio|default:'این کاربر هنوز معرفی کوتاهی ثبت نکرده است.'|truncatechars:140 }}</p>
+            <a class="resume-card-link" href="{% url 'profile' resume_user.username %}">مشاهده رزومه <span>←</span></a>
+          </article>
+        {% empty %}
+          <div class="resume-empty">
+            <span>هنوز رزومه‌ای منتشر نشده است.</span>
+            <h2>اولین رزومه را شما بسازید.</h2>
+            <a class="button button-accent" href="{% url 'signup' %}">ساخت رزومه رایگان <span>←</span></a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

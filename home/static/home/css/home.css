@@ -30,10 +30,33 @@ a { color: inherit; text-decoration: none; }
 .home-scroll-progress { position: fixed; inset: 0 auto auto 0; width: 0; height: 3px; background: var(--coral); z-index: 20; transition: width .1s ease; }
 .home-menu-toggle { display: none; border: 0; background: transparent; padding: 8px; cursor: pointer; }.home-menu-toggle span { display: block; width: 24px; height: 2px; background: var(--ink); margin: 5px; transition: transform .3s ease, opacity .3s ease; }
 .home-back-top { position: fixed; right: 26px; bottom: 26px; width: 46px; height: 46px; border: 0; border-radius: 50%; background: var(--coral); color: #fff; font-size: 1.3rem; cursor: pointer; opacity: 0; visibility: hidden; transform: translateY(18px); transition: all .3s cubic-bezier(.4,0,.2,1); z-index: 9; box-shadow: 0 8px 24px rgba(242,122,93,.3); }.home-back-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }.home-back-top:hover { transform: translateY(-4px); }
+.resume-bank-page { background: var(--paper); min-height: calc(100vh - 150px); }
+.resume-bank-hero { padding: 78px 0 70px; background: linear-gradient(135deg, rgba(37,99,235,.08), rgba(139,92,246,.06)); border-bottom: 1px solid var(--line); }
+.resume-bank-hero h1 { font-size: clamp(2.7rem, 6vw, 5rem); line-height: 1.1; margin: 16px 0; letter-spacing: -.06em; }
+.resume-bank-hero p { max-width: 560px; color: var(--muted); font-size: 1.08rem; margin: 0; }
+.resume-bank-section { padding: 76px 0 100px; }
+.resume-bank-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 38px; }
+.section-kicker { color: var(--coral); font-size: .8rem; font-weight: 800; }
+.resume-bank-heading h2 { margin: 12px 0 0; font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -.05em; }
+.resume-count { color: var(--muted); font-size: .85rem; white-space: nowrap; }
+.resume-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.resume-card { display: flex; flex-direction: column; min-height: 330px; padding: 26px; background: var(--cream); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease; }
+.resume-card:hover { transform: translateY(-6px); border-color: var(--coral); box-shadow: 0 20px 40px rgba(18,33,31,.12); }
+.resume-card-top { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.resume-avatar { width: 68px; height: 68px; border-radius: 50%; object-fit: cover; border: 3px solid var(--mint); }
+.resume-avatar-placeholder { display: grid; place-items: center; background: var(--mint); color: var(--ink); font-size: 1.5rem; font-weight: 900; }
+.resume-status { padding: 5px 10px; color: #337761; background: var(--mint); border-radius: 30px; font-size: .7rem; font-weight: 800; }
+.resume-card h3 { margin: 24px 0 4px; font-size: 1.35rem; }
+.resume-title { color: var(--coral); font-weight: 700; margin: 0; }
+.resume-bio { color: var(--muted); font-size: .9rem; line-height: 1.9; margin: 18px 0; }
+.resume-card-link { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 18px; border-top: 1px solid var(--line); font-weight: 800; }
+.resume-card-link span { color: var(--coral); transition: transform .3s ease; }.resume-card:hover .resume-card-link span { transform: translateX(-5px); }
+.resume-empty { grid-column: 1 / -1; padding: 60px 24px; text-align: center; background: var(--cream); border: 1px solid var(--line); border-radius: 20px; }.resume-empty span { color: var(--coral); font-weight: 800; }.resume-empty h2 { margin: 12px 0 24px; }
 .hero-copy, .hero-board { animation: homeReveal .7s cubic-bezier(.4,0,.2,1) both; }.hero-board { animation-delay: .12s; transition: transform .4s ease, box-shadow .4s ease; }.hero-board:hover { transform: rotate(0) translateY(-8px); box-shadow: 0 26px 66px rgba(18,33,31,.18); }
 .feature-grid article, .steps-grid > div, .post-card { border-radius: 20px; transition: transform .3s cubic-bezier(.4,0,.2,1), border-color .3s ease, box-shadow .3s ease; }.feature-grid article:hover, .steps-grid > div:hover, .post-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(18,33,31,.1); }.feature-grid article:hover b { letter-spacing: .15em; transition: letter-spacing .3s ease; }.post-card a span { display: inline-block; transition: transform .3s ease; }.post-card:hover a span { transform: translateX(-5px); }
 .feature-grid article { background: var(--cream); border: 1px solid var(--line); border-top: 0; padding: 32px; box-shadow: var(--shadow); position: relative; overflow: hidden; }.feature-grid article::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, var(--coral), #8b5cf6); transform: scaleX(0); transform-origin: right; transition: transform .4s ease; }.feature-grid article:hover::before { transform: scaleX(1); }.section-heading { text-align: center; }.section-heading h2 { font-weight: 800; color: var(--ink); }.steps-section .section-heading h2 { color: #fff; }
 .button:focus-visible, .outline-link:focus-visible, .home-nav a:focus-visible { outline: 3px solid rgba(242,122,93,.4); outline-offset: 4px; }
 @keyframes homeReveal { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0) rotate(2deg); } }
 @media (max-width: 800px) { .home-menu-toggle { display: block; }.home-nav { position: absolute; top: 68px; right: 16px; left: 16px; display: flex; flex-direction: column; gap: 4px; padding: 12px; background: var(--cream); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all .3s ease; }.home-nav.open { opacity: 1; visibility: visible; transform: translateY(0); }.home-nav a { padding: 10px 12px; border-radius: 12px; }.home-nav a:hover { background: var(--mint); }.home-menu-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }.home-menu-toggle.open span:nth-child(2) { opacity: 0; }.home-menu-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); } }
+@media (max-width: 800px) { .resume-bank-hero { padding: 58px 0 52px; }.resume-bank-section { padding: 58px 0 76px; }.resume-bank-heading { align-items: start; flex-direction: column; margin-bottom: 28px; }.resume-grid { grid-template-columns: 1fr; }.resume-card { min-height: 300px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }

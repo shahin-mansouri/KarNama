@@ -122,6 +122,6 @@ This project uses SQLite by default, which makes it convenient for local develop
 
 ## Author
 
-Created and maintained by **Manso**.
+Created and maintained by **Shahin Mansouri**.
 
 I am open to learning, improving this project, and building useful web experiences with modern development tools.

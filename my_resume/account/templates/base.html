@@ -1,0 +1,445 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}KarNama{% endblock %}</title>
+    
+    <!-- فونت وزیرمتن -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --success: #10b981;
+            --error: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            padding: 20px;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 33px 0px;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .navbar-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-logout {
+            color: var(--text);
+            background: transparent;
+            border: 0;
+            font: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        .navbar-logout:hover {
+            color: var(--primary);
+        }
+
+        .navbar-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .navbar-links a:hover {
+            color: var(--primary);
+        }
+
+        .navbar-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: var(--text);
+            z-index: 1001;
+            position: relative;
+        }
+
+        .menu-toggle svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Main Content */
+        .main-content {
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 80px;
+        }
+
+        /* Messages */
+        .messages {
+            margin-bottom: 1.5rem;
+        }
+
+        .message {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            animation: slideIn 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 3rem;
+        }
+
+        /* Responsive Breakpoints */
+        
+        /* Large Desktop (1400px+) */
+        @media (min-width: 1400px) {
+            .main-content {
+                max-width: 1400px;
+            }
+        }
+
+        /* Desktop (1025px - 1399px) */
+        @media (min-width: 1025px) and (max-width: 1399px) {
+            .main-content {
+                max-width: 1000px;
+            }
+        }
+
+        /* Tablet (768px - 1024px) */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .navbar {
+                padding: 0.875rem 1.5rem;
+                border-radius: 0px;
+            }
+
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+
+            .navbar-links {
+                gap: 1.2rem;
+                font-size: 0.95rem;
+            }
+
+            .main-content {
+                max-width: 90%;
+            }
+        }
+
+        /* Mobile (481px - 767px) */
+        @media (max-width: 767px) {
+            body {        
+                flex-direction: column;
+                align-items: stretch;
+                justify-content: flex-start;
+                padding: 15px;
+            }
+
+            .navbar {
+                padding: 0.875rem 1rem;
+                border-radius: 0px;
+            }
+
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .navbar-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 250px;
+                height: 100vh;
+                background: white;
+                flex-direction: column;
+                padding: 5rem 1.5rem 2rem;
+                gap: 1rem;
+                box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+                transition: right 0.3s ease;
+                z-index: 999;
+            }
+
+            .navbar-links.active {
+                right: 0;
+            }
+
+            .navbar-links a {
+                padding: 0.75rem 0;
+                font-size: 1rem;
+            }
+
+            .main-content {
+                margin-top: 70px;
+            }
+
+            .message {
+                padding: 0.875rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .footer {
+                padding: 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Small Mobile (320px - 480px) */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .navbar {
+                padding: 0.75rem 0.875rem;
+                border-radius: 0px;
+            }
+
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+
+            .navbar-links {
+                width: 200px;
+                padding: 1.5rem 1rem;
+            }
+
+            .main-content {
+                margin-top: 65px;
+            }
+
+            .message {
+                padding: 0.75rem 0.875rem;
+                font-size: 0.85rem;
+                border-radius: 8px;
+            }
+
+            .footer {
+                padding: 1rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Extra Small Mobile (below 320px) */
+        @media (max-width: 320px) {
+            .navbar {
+                padding: 0.625rem 0.75rem;
+                border-radius: 0px;
+            }
+
+            .navbar-brand {
+                font-size: 1rem;
+            }
+
+            .navbar-links {
+                width: 180px;
+                padding: 1rem 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .main-content {
+                margin-top: 60px;
+            }
+        }
+
+        /* Landscape Mode */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                align-items: flex-start;
+                padding-top: 80px;
+            }
+
+            .main-content {
+                margin-top: 70px;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand"><img style="width: 80px; height: 60px;" src="{% static 'index/image/logo.png' %}" alt="KarNama" srcset=""></a>
+        
+        
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <ul class="navbar-links" id="navbarLinks">
+            {% if user.is_authenticated %}
+                {% comment %} <li><a href="{% url 'dashboard' %}">داشبورد</a></li> {% endcomment %}
+                <li>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="navbar-logout">خروج</button>
+                    </form>
+                </li>
+            {% else %}
+                <li><a href="{% url 'login' %}">ورود</a></li>
+                {% comment %} <li><a href="{% url 'register' %}">ثبت‌نام</a></li> {% endcomment %}
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 کارنما. تمامی حقوق محفوظ است.</p>
+    </footer>
+
+    <script>
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const navbarLinks = document.getElementById('navbarLinks');
+
+    if (menuToggle && navbarLinks) {
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            navbarLinks.classList.toggle('active');
+            
+            // Change icon
+            const isActive = navbarLinks.classList.contains('active');
+            this.innerHTML = isActive 
+                ? '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>'
+                : '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!navbarLinks.contains(e.target) && !menuToggle.contains(e.target)) {
+                navbarLinks.classList.remove('active');
+                menuToggle.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+            }
+        });
+
+        // Close menu when clicking a link
+        const links = navbarLinks.querySelectorAll('a');
+        links.forEach(link => {
+            link.addEventListener('click', function() {
+                navbarLinks.classList.remove('active');
+                menuToggle.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+            });
+        });
+    }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

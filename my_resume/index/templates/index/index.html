@@ -1,0 +1,118 @@
+﻿{% extends 'index/base.html' %}
+{% load static %}
+
+{% block title %}شاهین منصوری | نمونه‌کار حرفه‌ای{% endblock %}
+{% block meta_description %}نمونه‌کار و رزومه آنلاین شاهین منصوری، توسعه‌دهنده فرانت‌اند و بک‌اند.{% endblock %}
+
+{% block content %}
+<main>
+  <section id="hero" class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-image">
+          {% if profile and profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" alt="{{ portfolio_data.personal.name }}" loading="lazy" />
+          {% else %}
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%23e2e8f0'/%3E%3Ctext x='200' y='200' font-size='80' text-anchor='middle' dy='.3em' fill='%23334155'%3E%F0%9F%91%A8%u200D%F0%9F%92%BB%3C/text%3E%3C/svg%3E" alt="{{ portfolio_data.personal.name }}" loading="lazy" />
+          {% endif %}
+        </div>
+        <div class="hero-content">
+          <h1>{{ portfolio_data.personal.name|default:'شاهین منصوری' }}</h1>
+          <div class="title">{{ portfolio_data.personal.title|default:'توسعه‌دهنده نرم‌افزار' }}</div>
+          <p>{{ portfolio_data.personal.bio|default:'عاشق ساخت تجربه‌های کاربری سریع، زیبا و در دسترس.' }}</p>
+          <div class="hero-btns">
+            <a href="#projects" class="btn">مشاهده پروژه‌ها</a>
+            <a href="/assets/documents/CV.pdf" download class="btn btn-outline">دانلود رزومه</a>
+          </div>
+          <div class="hero-social">
+            <a href="#" aria-label="GitHub">🐙</a>
+            <a href="#" aria-label="LinkedIn">🔗</a>
+            <a href="#" aria-label="Email">✉️</a>
+          </div>
+        </div>
+      </div>
+      <div class="stats" id="statsContainer">
+        <div class="stat-item"><div class="num" data-count="{{ portfolio_data.stats.projects }}">0</div><div class="label">پروژه</div></div>
+        <div class="stat-item"><div class="num" data-count="{{ portfolio_data.stats.experience }}">0</div><div class="label">سابقه کاری</div></div>
+        <div class="stat-item"><div class="num" data-count="{{ portfolio_data.stats.technologies }}">0</div><div class="label">فناوری</div></div>
+        <div class="stat-item"><div class="num" data-count="{{ portfolio_data.stats.certifications }}">0</div><div class="label">گواهینامه</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="container">
+      <h2 class="section-title">درباره من</h2>
+      <div class="card" style="max-width:800px;">
+        <p>{{ portfolio_data.about|default:'اطلاعاتی برای بخش درباره من ثبت نشده است.' }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="container">
+      <h2 class="section-title">مهارت‌ها</h2>
+      <div class="skills-grid" id="skillsGrid"></div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="container">
+      <h2 class="section-title">تجربه کاری</h2>
+      <div class="timeline" id="experienceTimeline"></div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="container">
+      <h2 class="section-title">پروژه‌ها</h2>
+      <div class="filter-btns" id="filterBtns"></div>
+      <div class="projects-grid" id="projectsGrid"></div>
+    </div>
+  </section>
+
+  <section id="certificates">
+    <div class="container">
+      <h2 class="section-title">گواهینامه‌ها</h2>
+      <div class="certificates-grid" id="certificatesGrid"></div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <h2 class="section-title">تماس با من</h2>
+      <div class="contact-grid">
+        <div>
+          <p style="margin-bottom:16px;">خوشحال می‌شوم از شما بشنوم! می‌توانید از طریق فرم یا شبکه‌های اجتماعی با من در تماس باشید.</p>
+          <div style="display:flex; gap:16px; font-size:1.4rem;">
+            <a href="#" aria-label="GitHub">🐙</a>
+            <a href="#" aria-label="LinkedIn">🔗</a>
+            <a href="#" aria-label="Email">✉️</a>
+          </div>
+        </div>
+        <form id="contactForm" novalidate>
+          <div class="form-group">
+            <label for="name">نام</label>
+            <input type="text" id="name" required aria-required="true" />
+          </div>
+          <div class="form-group">
+            <label for="email">ایمیل</label>
+            <input type="email" id="email" required aria-required="true" />
+          </div>
+          <div class="form-group">
+            <label for="subject">موضوع</label>
+            <input type="text" id="subject" required />
+          </div>
+          <div class="form-group">
+            <label for="message">پیام</label>
+            <textarea id="message" required></textarea>
+          </div>
+          <button type="submit" class="btn">ارسال پیام</button>
+          <div class="form-message" id="formMessage"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+{{ portfolio_data|json_script:"portfolio-data" }}
+{% endblock %}

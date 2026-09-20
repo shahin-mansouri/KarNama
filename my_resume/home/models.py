@@ -1,0 +1,19 @@
+from django.db import models
+
+
+class BlogPost(models.Model):
+	title = models.CharField(max_length=180, verbose_name='عنوان مطلب')
+	slug = models.SlugField(max_length=200, unique=True, verbose_name='نشانی مطلب')
+	excerpt = models.TextField(max_length=300, verbose_name='خلاصه مطلب')
+	content = models.TextField(verbose_name='متن مطلب')
+	category = models.CharField(max_length=80, verbose_name='دسته‌بندی')
+	published_at = models.DateTimeField(verbose_name='تاریخ انتشار')
+	is_published = models.BooleanField(default=False, verbose_name='منتشر شده')
+
+	class Meta:
+		ordering = ('-published_at',)
+		verbose_name = 'مطلب وبلاگ'
+		verbose_name_plural = 'مطالب وبلاگ'
+
+	def __str__(self):
+		return self.title

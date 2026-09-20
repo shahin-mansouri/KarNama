@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}ورود | کارنما{% endblock %}
+
+{% block extra_css %}
+<style>
+  .otp-card { width: min(100%, 440px); margin: 100px auto 30px; padding: 34px; background: var(--card-bg); border-radius: 24px; box-shadow: var(--shadow); }
+  .otp-card h1 { margin-bottom: 8px; }.otp-card p { color: var(--text-light); margin-bottom: 24px; }
+  .otp-field { margin-bottom: 18px; }.otp-field label { display: block; margin-bottom: 7px; font-weight: 600; }.otp-field input { width: 100%; padding: 13px; border: 2px solid var(--border); border-radius: 12px; font: inherit; }.otp-field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99,102,241,.12); }
+  .otp-submit { width: 100%; border: 0; padding: 14px; border-radius: 12px; background: linear-gradient(135deg,var(--primary),var(--primary-dark)); color: white; font: inherit; font-weight: 700; cursor: pointer; }.otp-submit:hover { transform: translateY(-2px); }
+  .otp-hint { margin-top: 18px; font-size: .85rem; }.otp-error, .errorlist { color: var(--error); font-size: .85rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="otp-card">
+  <h1>{% if otp_step == 'verify' %}تأیید شماره تماس{% else %}ورود به کارنما{% endif %}</h1>
+  <p>{% if otp_step == 'verify' %}کد ۶ رقمی ارسال‌شده برای {{ otp_phone }} را وارد کنید.{% else %}شماره تماس خود را وارد کنید تا کد ورود برایتان ارسال شود.{% endif %}</p>
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}<div class="otp-field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endfor %}
+    <button class="otp-submit" type="submit">{% if otp_step == 'verify' %}ورود{% else %}ارسال کد تأیید{% endif %}</button>
+  </form>
+  <p class="otp-hint">حساب جدید؟ بعد از تأیید شماره، اطلاعات پروفایل خود را مرحله‌به‌مرحله تکمیل می‌کنید.</p>
+</div>
+{% endblock %}

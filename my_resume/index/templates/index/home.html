@@ -1,0 +1,112 @@
+{% extends 'index/base.html' %}
+{% load static %}
+
+{% block title %}کارنما | ساخت رزومه حرفه‌ای در چند دقیقه{% endblock %}
+
+{% block meta_description %}با کارنما، به راحتی و در کمتر از ۵ دقیقه یک رزومه حرفه‌ای، استاندارد و زیبا بسازید و شانس استخدام خود را افزایش دهید.{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'index/css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="badge">🚀 نسخه جدید با قالب‌های بیشتر</span>
+        <h1>رزومه‌ای بسازید که <br><span class="highlight">شما را متمایز کند</span></h1>
+        <p>با کارنما، بدون نیاز به دانش فنی، در کمتر از ۵ دقیقه یک رزومه حرفه‌ای و استاندارد ایجاد کنید و شانس استخدام خود را چند برابر نمایید.</p>
+        <div class="hero-actions">
+          <a href="{% url 'login' %}" class="btn btn-primary">
+            شروع رایگان
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          </a>
+          <a href="#features" class="btn btn-secondary">مشاهده قابلیت‌ها</a>
+        </div>
+      </div>
+      
+      <div class="hero-visual">
+        <div class="mockup-card card-1">
+          <div class="skeleton-circle"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line"></div>
+        </div>
+        <div class="mockup-card card-2">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>چرا کارنما؟</h2>
+        <p>تمام ابزارهایی که برای ساخت یک رزومه بی‌نقص و حرفه‌ای نیاز دارید، در یک پلتفرم</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="icon-box">📄</div>
+          <h3>قالب‌های حرفه‌ای</h3>
+          <p>بیش از ۲۰ قالب استاندارد و مدرن که توسط متخصصین منابع انسانی و شرکت‌های بزرگ تایید شده‌اند.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-box">⚡</div>
+          <h3>پیش‌نمایش زنده</h3>
+          <p>هر تغییری که در فرم می‌دهید را به صورت لحظه‌ای و بدون نیاز به رفرش در رزومه خود مشاهده کنید.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-box">📥</div>
+          <h3>خروجی PDF باکیفیت</h3>
+          <p>رزومه نهایی خود را با فرمت PDF استاندارد، فونت‌های تعبیه‌شده و کیفیت چاپ بالا دانلود کنید.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-box">🤖</div>
+          <h3>پیشنهادات هوشمند</h3>
+          <p>دریافت پیشنهادات نوشتاری هوشمند برای بهبود توضیحات سوابق شغلی و افزایش جذابیت رزومه.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Steps Section -->
+  <section class="steps">
+    <div class="container">
+      <div class="section-header">
+        <h2>در ۳ مرحله ساده استخدام شوید</h2>
+        <p>فرآیند ساخت رزومه را برای شما تا حد ممکن ساده کرده‌ایم</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-item">
+          <div class="step-number">۱</div>
+          <h3>ثبت‌نام کنید</h3>
+          <p>یک حساب کاربری رایگان با شماره تماس یا ایمیل بسازید.</p>
+        </div>
+        <div class="step-item">
+          <div class="step-number">۲</div>
+          <h3>اطلاعات را وارد کنید</h3>
+          <p>سوابق تحصیلی، شغلی و مهارت‌های خود را در فرم‌های راهنما وارد نمایید.</p>
+        </div>
+        <div class="step-item">
+          <div class="step-number">۳</div>
+          <h3>دانلود و ارسال</h3>
+          <p>قالب مورد نظر را انتخاب، رزومه نهایی را دانلود و برای کارفرما ارسال کنید.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>آماده‌اید شانس استخدام خود را افزایش دهید؟</h2>
+      <p>همین حالا به هزاران کاربری بپیوندید که با کارنما شغل رویایی خود را پیدا کرده‌اند.</p>
+      <a href="{% url 'login' %}" class="btn btn-large">ساخت رزومه رایگان</a>
+    </div>
+  </section>
+{% endblock %}

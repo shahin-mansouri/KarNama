@@ -20,11 +20,11 @@
           <span class="section-kicker">رزومه‌های منتشرشده</span>
           <h2>آدم‌های پشت مسیرهای حرفه‌ای</h2>
         </div>
-        <span class="resume-count">{{ resume_users|length }} رزومه</span>
+        <span class="resume-count">{{ resume_count }} رزومه</span>
       </div>
 
       <div class="resume-grid">
-        {% for resume_user in resume_users %}
+        {% for resume_user in page_obj %}
           <article class="resume-card">
             <div class="resume-card-top">
               {% if resume_user.userprofile.profile_picture %}
@@ -43,10 +43,30 @@
           <div class="resume-empty">
             <span>هنوز رزومه‌ای منتشر نشده است.</span>
             <h2>اولین رزومه را شما بسازید.</h2>
-            <a class="button button-accent" href="{% url 'signup' %}">ساخت رزومه رایگان <span>←</span></a>
+            <a class="button button-accent" href="{% url 'login' %}">ساخت رزومه رایگان <span>←</span></a>
           </div>
         {% endfor %}
       </div>
+
+      {% if page_obj.has_other_pages %}
+        <nav class="pagination" aria-label="pagination">
+          {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <span class="current-page">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">بعدی</a>
+          {% endif %}
+        </nav>
+      {% endif %}
     </div>
   </section>
 </main>

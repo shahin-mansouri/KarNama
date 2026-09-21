@@ -4,7 +4,10 @@ from .models import (
 	AboutMe,
 	Certificate,
 	FieldOfActivity,
+	Language,
 	Project,
+	Research,
+	SocialLink,
 	Skill,
 	UserCustom,
 	UserProfile,
@@ -22,7 +25,7 @@ class UserCustomAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-	list_display = ('user', 'title')
+	list_display = ('user', 'title', 'birth_date', 'marital_status', 'military_status')
 	search_fields = ('user__username', 'title')
 
 
@@ -70,3 +73,22 @@ class CertificateAdmin(admin.ModelAdmin):
 	list_display = ('name', 'issuer', 'user', 'issue_date')
 	search_fields = ('name', 'issuer', 'user__username')
 	list_filter = ('issue_date',)
+
+
+@admin.register(Language)
+class LanguageAdmin(admin.ModelAdmin):
+	list_display = ('name', 'user', 'proficiency')
+	search_fields = ('name', 'user__username')
+
+
+@admin.register(Research)
+class ResearchAdmin(admin.ModelAdmin):
+	list_display = ('title', 'user', 'year')
+	search_fields = ('title', 'user__username')
+	list_filter = ('year',)
+
+
+@admin.register(SocialLink)
+class SocialLinkAdmin(admin.ModelAdmin):
+	list_display = ('platform', 'user', 'url')
+	search_fields = ('user__username', 'url')

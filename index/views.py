@@ -4,7 +4,10 @@ from django.views.generic import TemplateView
 from account.models import (
     AboutMe,
     Certificate,
+    Language,
     Project,
+    Research,
+    SocialLink,
     Skill,
     UserCustom,
     UserProfile,
@@ -25,6 +28,9 @@ class Index(TemplateView):
         experiences = WorkExperience.objects.filter(user=owner).prefetch_related('worktechuse_set')
         projects = Project.objects.filter(user=owner).select_related('field_of_activity')
         certificates = Certificate.objects.filter(user=owner).order_by('-issue_date', '-id')
+        languages = Language.objects.filter(user=owner)
+        researches = Research.objects.filter(user=owner)
+        social_links = SocialLink.objects.filter(user=owner)
         profile = UserProfile.objects.filter(user=owner).first()
         about = AboutMe.objects.filter(user=owner).first()
         testimonials = Testimonial.objects.filter(
@@ -50,6 +56,10 @@ class Index(TemplateView):
                 'name': owner.get_full_name() or owner.username,
                 'title': profile.title if profile else 'توسعه‌دهنده نرم‌افزار',
                 'bio': profile.bio if profile else '',
+                'address': profile.address if profile and profile.address else owner.address or '',
+                'birth_date': profile.birth_date.isoformat() if profile and profile.birth_date else '',
+                'marital_status': profile.get_marital_status_display() if profile and profile.marital_status else '',
+                'military_status': profile.get_military_status_display() if profile and profile.military_status else '',
             },
             'about': about.about_me if about else (profile.bio if profile else ''),
             'skills': [
@@ -78,6 +88,18 @@ class Index(TemplateView):
                     'link': certificate.certificate_link or '#',
                 }
                 for certificate in certificates
+            ],
+            'languages': [
+                {'name': language.name, 'level': language.proficiency}
+                for language in languages
+            ],
+            'researches': [
+                {'title': research.title, 'description': research.description or '', 'year': research.year, 'link': research.link or '#'}
+                for research in researches
+            ],
+            'social_links': [
+                {'platform': social.platform, 'label': social.get_platform_display(), 'url': social.url}
+                for social in social_links
             ],
             'stats': {
                 'projects': projects.count(),

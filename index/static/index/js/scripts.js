@@ -4,6 +4,9 @@ const skillsData = portfolioData.skills;
 const experienceData = portfolioData.experience;
 const projectsData = portfolioData.projects;
 const certificatesData = portfolioData.certificates;
+const languagesData = portfolioData.languages || [];
+const researchesData = portfolioData.researches || [];
+const socialLinksData = portfolioData.social_links || [];
 const testimonialsData = portfolioData.testimonials || [];
 
 // ---------- STATE ----------
@@ -22,6 +25,11 @@ const skillsGrid = document.getElementById('skillsGrid');
 const expTimeline = document.getElementById('experienceTimeline');
 const projectsGrid = document.getElementById('projectsGrid');
 const certificatesGrid = document.getElementById('certificatesGrid');
+const languagesGrid = document.getElementById('languagesGrid');
+const researchesGrid = document.getElementById('researchesGrid');
+const socialLinksGrid = document.getElementById('socialLinksGrid');
+const heroSocialLinks = document.getElementById('heroSocialLinks');
+const contactSocialLinks = document.getElementById('contactSocialLinks');
 const testimonialsGrid = document.getElementById('testimonialsGrid');
 const filterBtns = document.getElementById('filterBtns');
 const contactForm = document.getElementById('contactForm');
@@ -106,6 +114,50 @@ function renderCertificates() {
         ${certificate.link !== '#' ? `<a href="${certificate.link}" target="_blank" rel="noopener" data-print-url="${compactUrl(certificate.link)}">مشاهده گواهینامه</a>` : ''}
     </article>
     `).join('') : '<p class="empty-state">هنوز گواهینامه‌ای ثبت نشده است.</p>';
+}
+
+function renderLanguages() {
+    if (!languagesGrid) return;
+    languagesGrid.innerHTML = languagesData.map(language => `
+    <div class="language-item card fade-in">
+        <div class="language-heading"><strong>${escapeHtml(language.name)}</strong><span>${language.level}%</span></div>
+        <div class="skill-bar"><div class="fill" style="width:${language.level}%; --skill-level:${language.level}%"></div></div>
+    </div>
+    `).join('');
+}
+
+function renderResearches() {
+    if (!researchesGrid) return;
+    researchesGrid.innerHTML = researchesData.map(research => `
+    <article class="research-card card fade-in">
+        <div class="research-year">${research.year}</div>
+        <h3>${escapeHtml(research.title)}</h3>
+        ${research.description ? `<p class="research-description">${escapeHtml(research.description)}</p>` : ''}
+        ${research.link && research.link !== '#' ? `<a href="${research.link}" target="_blank" rel="noopener" data-print-url="${compactUrl(research.link)}">مراجعه به تحقیق</a>` : ''}
+    </article>
+    `).join('');
+}
+
+const socialIconUrls = {
+    github: 'https://cdn.simpleicons.org/github',
+    linkedin: 'https://cdn.simpleicons.org/linkedin',
+    instagram: 'https://cdn.simpleicons.org/instagram',
+    twitter: 'https://cdn.simpleicons.org/x',
+    telegram: 'https://cdn.simpleicons.org/telegram',
+    facebook: 'https://cdn.simpleicons.org/facebook',
+    youtube: 'https://cdn.simpleicons.org/youtube',
+    website: 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/globe.svg',
+};
+function socialLinkMarkup(social) {
+    const iconUrl = socialIconUrls[social.platform] || 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/svgs/solid/link.svg';
+    return `<a class="social-link" href="${social.url}" target="_blank" rel="noopener" aria-label="${escapeHtml(social.label)}" title="${escapeHtml(social.label)}" data-print-url="${compactUrl(social.url)}"><img src="${iconUrl}" alt="" loading="lazy"><span>${escapeHtml(social.label)}</span></a>`;
+}
+
+function renderSocialLinks() {
+    const markup = socialLinksData.map(socialLinkMarkup).join('');
+    if (socialLinksGrid) socialLinksGrid.innerHTML = markup;
+    if (heroSocialLinks) heroSocialLinks.innerHTML = markup;
+    if (contactSocialLinks) contactSocialLinks.innerHTML = markup;
 }
 
 function escapeHtml(value) {
@@ -309,6 +361,9 @@ function init() {
     renderExperience();
     renderProjects();
     renderCertificates();
+    renderLanguages();
+    renderResearches();
+    renderSocialLinks();
     renderTestimonials();
     renderStats();
     // observe fade-in

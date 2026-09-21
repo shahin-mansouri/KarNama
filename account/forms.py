@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 from .models import (
     AboutMe, Certificate, FieldOfActivity, Project, Skill, UserCustom,
-    UserProfile, WorkExperience, WorkTechUse,
+    Language, Research, SocialLink, UserProfile, WorkExperience, WorkTechUse,
 )
 
 
@@ -26,8 +26,9 @@ class UserDetailsForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ('title', 'bio', 'profile_picture')
-        labels = {'title': 'عنوان شغلی', 'bio': 'معرفی کوتاه', 'profile_picture': 'تصویر پروفایل'}
+        fields = ('title', 'bio', 'profile_picture', 'address', 'birth_date', 'marital_status', 'military_status')
+        labels = {'title': 'عنوان شغلی', 'bio': 'معرفی کوتاه', 'profile_picture': 'تصویر پروفایل', 'address': 'آدرس', 'birth_date': 'تاریخ تولد', 'marital_status': 'وضعیت تاهل', 'military_status': 'وضعیت سربازی'}
+        widgets = {'birth_date': forms.DateInput(attrs={'type': 'date'})}
 
 
 class AboutMeForm(forms.ModelForm):
@@ -87,6 +88,27 @@ class CertificateForm(forms.ModelForm):
         fields = ('name', 'issuer', 'issue_date', 'certificate_link')
         labels = {'name': 'نام گواهینامه', 'issuer': 'صادرکننده', 'issue_date': 'تاریخ دریافت', 'certificate_link': 'لینک گواهینامه'}
         widgets = {'issue_date': forms.DateInput(attrs={'type': 'date'})}
+
+
+class LanguageForm(forms.ModelForm):
+    class Meta:
+        model = Language
+        fields = ('name', 'proficiency')
+        labels = {'name': 'نام زبان', 'proficiency': 'درصد تسلط'}
+
+
+class ResearchForm(forms.ModelForm):
+    class Meta:
+        model = Research
+        fields = ('title', 'description', 'year', 'link')
+        labels = {'title': 'عنوان تحقیق', 'description': 'توضیحات تحقیق', 'year': 'سال تحقیق', 'link': 'لینک مراجعه به تحقیق'}
+
+
+class SocialLinkForm(forms.ModelForm):
+    class Meta:
+        model = SocialLink
+        fields = ('platform', 'url')
+        labels = {'platform': 'شبکه اجتماعی', 'url': 'لینک صفحه'}
 
 
 class SignUpForm(UserCreationForm):

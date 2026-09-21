@@ -11,9 +11,10 @@ from django.urls import reverse_lazy
 
 from .forms import (
 	AboutMeForm, CertificateForm, ExperienceForm, OTPForm, PhoneForm,
-	ProjectForm, SignUpForm, SkillForm, UserDetailsForm, UserProfileForm,
+	LanguageForm, ProjectForm, ResearchForm, SignUpForm, SkillForm,
+	SocialLinkForm, UserDetailsForm, UserProfileForm,
 )
-from .models import AboutMe, Certificate, Skill, UserCustom, UserProfile, WorkExperience
+from .models import AboutMe, Certificate, Language, Research, Skill, SocialLink, UserCustom, UserProfile, WorkExperience
 
 
 def normalize_phone(value):
@@ -64,7 +65,7 @@ def onboarding(request):
 	step = int(request.session.get('onboarding_step', 0))
 	if step > 0 and not request.user.is_authenticated:
 		return redirect('login')
-	forms = [UserDetailsForm, UserProfileForm, AboutMeForm, SkillForm, ExperienceForm, ProjectForm, CertificateForm]
+	forms = [UserDetailsForm, UserProfileForm, AboutMeForm, SkillForm, ExperienceForm, ProjectForm, CertificateForm, LanguageForm, ResearchForm, SocialLinkForm]
 	form_class = forms[step]
 	if request.method == 'POST':
 		data = request.POST.copy()
@@ -90,10 +91,14 @@ def onboarding(request):
 				form.save_with_technologies(request.user)
 			elif step == 5:
 				form.save_with_user(request.user)
+			elif step == 6:
+				obj = form.save(commit=False)
+				obj.user = request.user
+				obj.save()
 			else:
-				certificate = form.save(commit=False)
-				certificate.user = request.user
-				certificate.save()
+				obj = form.save(commit=False)
+				obj.user = request.user
+				obj.save()
 			if step == len(forms) - 1:
 				request.session.pop('onboarding_phone', None)
 				request.session.pop('onboarding_step', None)
@@ -116,10 +121,11 @@ def dashboard(request):
 		'about_form': AboutMeForm(instance=AboutMe.objects.filter(user=request.user).first()),
 		'skill_form': SkillForm(), 'experience_form': ExperienceForm(),
 		'project_form': ProjectForm(), 'certificate_form': CertificateForm(),
+		'language_form': LanguageForm(), 'research_form': ResearchForm(), 'social_form': SocialLinkForm(),
 	}
 	if request.method == 'POST':
 		action = request.POST.get('action')
-		form_map = {'user': ('user_form', UserDetailsForm), 'profile': ('profile_form', UserProfileForm), 'about': ('about_form', AboutMeForm), 'skill': ('skill_form', SkillForm), 'experience': ('experience_form', ExperienceForm), 'project': ('project_form', ProjectForm), 'certificate': ('certificate_form', CertificateForm)}
+		form_map = {'user': ('user_form', UserDetailsForm), 'profile': ('profile_form', UserProfileForm), 'about': ('about_form', AboutMeForm), 'skill': ('skill_form', SkillForm), 'experience': ('experience_form', ExperienceForm), 'project': ('project_form', ProjectForm), 'certificate': ('certificate_form', CertificateForm), 'language': ('language_form', LanguageForm), 'research': ('research_form', ResearchForm), 'social': ('social_form', SocialLinkForm)}
 		if action in form_map:
 			key, form_class = form_map[action]
 			instance = forms[key].instance if action in ('user', 'profile', 'about') else None
@@ -135,6 +141,10 @@ def dashboard(request):
 					form.save_with_technologies(request.user)
 				elif action == 'project':
 					form.save_with_user(request.user)
+				elif action in ('language', 'research', 'social'):
+					obj = form.save(commit=False)
+					obj.user = request.user
+					obj.save()
 				else:
 					obj = form.save(commit=False)
 					obj.user = request.user
@@ -147,6 +157,9 @@ def dashboard(request):
 		'skills': Skill.objects.filter(user=request.user),
 		'experiences': WorkExperience.objects.filter(user=request.user),
 		'certificates': Certificate.objects.filter(user=request.user),
+		'languages': Language.objects.filter(user=request.user),
+		'researches': Research.objects.filter(user=request.user),
+		'social_links': SocialLink.objects.filter(user=request.user),
 	})
 
 

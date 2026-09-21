@@ -20,6 +20,14 @@
           <h1>{{ portfolio_data.personal.name|default:'شاهین منصوری' }}</h1>
           <div class="title">{{ portfolio_data.personal.title|default:'توسعه‌دهنده نرم‌افزار' }}</div>
           <p>{{ portfolio_data.personal.bio|default:'عاشق ساخت تجربه‌های کاربری سریع، زیبا و در دسترس.' }}</p>
+          {% if portfolio_data.personal.address or portfolio_data.personal.birth_date or portfolio_data.personal.marital_status or portfolio_data.personal.military_status %}
+          <div class="profile-details">
+            {% if portfolio_data.personal.address %}<span class="profile-address" title="آدرس"><span class="profile-detail-icon" aria-hidden="true">📍</span><span class="sr-only">آدرس: </span>{{ portfolio_data.personal.address }}</span>{% endif %}
+            {% if portfolio_data.personal.birth_date %}<span>تولد: {{ portfolio_data.personal.birth_date }}</span>{% endif %}
+            {% if portfolio_data.personal.marital_status %}<span>تاهل: {{ portfolio_data.personal.marital_status }}</span>{% endif %}
+            {% if portfolio_data.personal.military_status %}<span>سربازی: {{ portfolio_data.personal.military_status }}</span>{% endif %}
+          </div>
+          {% endif %}
           {% if owner.email or owner.phone_number or owner.address %}
           <ul class="print-contact print-only">
             {% if owner.email %}<li>{{ owner.email }}</li>{% endif %}
@@ -31,11 +39,7 @@
             <a href="#projects" class="btn">مشاهده پروژه‌ها</a>
             <button type="button" class="btn btn-outline print-resume-btn" id="printResume">چاپ / ذخیره PDF</button>
           </div>
-          <div class="hero-social">
-            <a href="#" aria-label="GitHub">🐙</a>
-            <a href="#" aria-label="LinkedIn">🔗</a>
-            <a href="#" aria-label="Email">✉️</a>
-          </div>
+          <div class="hero-social" id="heroSocialLinks"></div>
         </div>
       </div>
       <div class="stats" id="statsContainer">
@@ -85,6 +89,33 @@
     </div>
   </section>
 
+  {% if portfolio_data.languages %}
+  <section id="languages">
+    <div class="container">
+      <h2 class="section-title">زبان‌ها</h2>
+      <div class="languages-grid" id="languagesGrid"></div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if portfolio_data.researches %}
+  <section id="researches">
+    <div class="container">
+      <h2 class="section-title">تحقیقات</h2>
+      <div class="researches-grid" id="researchesGrid"></div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if portfolio_data.social_links %}
+  <section id="social-links">
+    <div class="container">
+      <h2 class="section-title">شبکه‌های اجتماعی</h2>
+      <div class="social-links-grid" id="socialLinksGrid"></div>
+    </div>
+  </section>
+  {% endif %}
+
   <section id="testimonials" class="testimonials-section">
     <div class="container">
       <div class="section-heading-row">
@@ -128,11 +159,9 @@
       <div class="contact-grid">
         <div>
           <p style="margin-bottom:16px;">خوشحال می‌شوم از شما بشنوم! می‌توانید از طریق فرم یا شبکه‌های اجتماعی با من در تماس باشید.</p>
-          <div style="display:flex; gap:16px; font-size:1.4rem;">
-            <a href="#" aria-label="GitHub">🐙</a>
-            <a href="#" aria-label="LinkedIn">🔗</a>
-            <a href="#" aria-label="Email">✉️</a>
-          </div>
+          {% if portfolio_data.social_links %}
+          <div class="contact-social-links" id="contactSocialLinks" aria-label="شبکه‌های اجتماعی"></div>
+          {% endif %}
         </div>
         <form id="contactForm" action="{% url 'send_message' username=owner.username %}" method="post" novalidate>
           {% csrf_token %}

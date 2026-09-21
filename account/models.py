@@ -19,10 +19,26 @@ class UserCustom(AbstractUser):
 
 
 class UserProfile(models.Model):
+
+    MARITAL_STATUS_CHOICES = (
+        ('single', 'مجرد'),
+        ('married', 'متاهل'),
+    )
+    MILITARY_STATUS_CHOICES = (
+        ('completed', 'پایان خدمت'),
+        ('exempt', 'معاف'),
+        ('in_progress', 'در حال انجام'),
+        ('not_applicable', 'مشمول نمی‌شود'),
+    )
+
     user = models.OneToOneField(UserCustom, on_delete=models.CASCADE, verbose_name='کاربر')
     title = models.CharField(max_length=20, verbose_name='عنوان شغلی')
     bio = models.TextField(blank=True, null=True, verbose_name='معرفی')
     profile_picture = models.ImageField(upload_to='media/profile_pictures/', blank=True, null=True, verbose_name='تصویر پروفایل')
+    address = models.TextField(blank=True, null=True, verbose_name='آدرس')
+    birth_date = models.DateField(blank=True, null=True, verbose_name='تاریخ تولد')
+    marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, blank=True, verbose_name='وضعیت تاهل')
+    military_status = models.CharField(max_length=20, choices=MILITARY_STATUS_CHOICES, blank=True, verbose_name='وضعیت سربازی')
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
@@ -121,5 +137,58 @@ class Certificate(models.Model):
     class Meta:
         verbose_name = 'گواهینامه'
         verbose_name_plural = 'گواهینامه‌ها'
+
+
+class Language(models.Model):
+    user = models.ForeignKey(UserCustom, on_delete=models.CASCADE, verbose_name='کاربر')
+    name = models.CharField(max_length=80, verbose_name='نام زبان')
+    proficiency = models.IntegerField(verbose_name='درصد تسلط')
+
+    def __str__(self):
+        return f'{self.name} - {self.proficiency}%'
+
+    class Meta:
+        verbose_name = 'زبان'
+        verbose_name_plural = 'زبان‌ها'
+
+
+class Research(models.Model):
+    user = models.ForeignKey(UserCustom, on_delete=models.CASCADE, verbose_name='کاربر')
+    title = models.CharField(max_length=200, verbose_name='عنوان تحقیق')
+    description = models.TextField(blank=True, null=True, verbose_name='توضیحات تحقیق')
+    year = models.PositiveIntegerField(verbose_name='سال تحقیق')
+    link = models.URLField(blank=True, null=True, verbose_name='لینک تحقیق')
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'تحقیق'
+        verbose_name_plural = 'تحقیقات'
+        ordering = ('-year', '-id')
+
+
+class SocialLink(models.Model):
+    PLATFORM_CHOICES = (
+        ('github', 'GitHub'),
+        ('linkedin', 'LinkedIn'),
+        ('instagram', 'Instagram'),
+        ('twitter', 'Twitter / X'),
+        ('telegram', 'Telegram'),
+        ('facebook', 'Facebook'),
+        ('youtube', 'YouTube'),
+        ('website', 'وب‌سایت'),
+    )
+
+    user = models.ForeignKey(UserCustom, on_delete=models.CASCADE, verbose_name='کاربر')
+    platform = models.CharField(max_length=30, choices=PLATFORM_CHOICES, verbose_name='شبکه اجتماعی')
+    url = models.URLField(verbose_name='لینک')
+
+    def __str__(self):
+        return f'{self.get_platform_display()} - {self.user.username}'
+
+    class Meta:
+        verbose_name = 'شبکه اجتماعی'
+        verbose_name_plural = 'شبکه‌های اجتماعی'
 
 

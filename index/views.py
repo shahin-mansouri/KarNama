@@ -11,6 +11,7 @@ from account.models import (
     WorkExperience,
     WorkTechUse,
 )
+from message.models import Testimonial
 
 
 class Index(TemplateView):
@@ -26,6 +27,10 @@ class Index(TemplateView):
         certificates = Certificate.objects.filter(user=owner).order_by('-issue_date', '-id')
         profile = UserProfile.objects.filter(user=owner).first()
         about = AboutMe.objects.filter(user=owner).first()
+        testimonials = Testimonial.objects.filter(
+            recipient=owner,
+            is_approved=True,
+        ).select_related('author')[:12]
         experience_data = []
         for experience in experiences[::-1]:
             experience_data.append({
@@ -80,6 +85,14 @@ class Index(TemplateView):
                 'technologies': WorkTechUse.objects.filter(work_experience__user=owner).count(),
                 'certifications': certificates.count(),
             },
+            'testimonials': [
+                {
+                    'author': testimonial.author.get_full_name() or testimonial.author.username,
+                    'role': testimonial.role,
+                    'text': testimonial.text,
+                }
+                for testimonial in testimonials
+            ],
         }
         return context
 

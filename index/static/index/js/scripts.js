@@ -4,6 +4,7 @@ const skillsData = portfolioData.skills;
 const experienceData = portfolioData.experience;
 const projectsData = portfolioData.projects;
 const certificatesData = portfolioData.certificates;
+const testimonialsData = portfolioData.testimonials || [];
 
 // ---------- STATE ----------
 let currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
@@ -21,9 +22,14 @@ const skillsGrid = document.getElementById('skillsGrid');
 const expTimeline = document.getElementById('experienceTimeline');
 const projectsGrid = document.getElementById('projectsGrid');
 const certificatesGrid = document.getElementById('certificatesGrid');
+const testimonialsGrid = document.getElementById('testimonialsGrid');
 const filterBtns = document.getElementById('filterBtns');
 const contactForm = document.getElementById('contactForm');
 const formMessage = document.getElementById('formMessage');
+const testimonialForm = document.getElementById('testimonialForm');
+const testimonialMessage = document.getElementById('testimonialMessage');
+let testimonialIndex = 0;
+let testimonialTimer;
 
 // ---------- THEME ----------
 function setTheme(theme) {
@@ -100,6 +106,48 @@ function renderCertificates() {
         ${certificate.link !== '#' ? `<a href="${certificate.link}" target="_blank" rel="noopener" data-print-url="${compactUrl(certificate.link)}">مشاهده گواهینامه</a>` : ''}
     </article>
     `).join('') : '<p class="empty-state">هنوز گواهینامه‌ای ثبت نشده است.</p>';
+}
+
+function escapeHtml(value) {
+    const element = document.createElement('div');
+    element.textContent = value || '';
+    return element.innerHTML;
+}
+
+function renderTestimonials() {
+    clearTimeout(testimonialTimer);
+    if (!testimonialsData.length) {
+        testimonialsGrid.innerHTML = '<p class="empty-state">هنوز نظری ثبت نشده است. اولین نفر باشید.</p>';
+        return;
+    }
+
+    const testimonial = testimonialsData[testimonialIndex % testimonialsData.length];
+    testimonialsGrid.innerHTML = `
+    <article class="testimonial-card fade-in visible">
+        <div class="quote-mark">“</div>
+        <p class="testimonial-text"></p>
+        <div class="testimonial-author">
+            <div class="author-avatar">${escapeHtml(testimonial.author).charAt(0)}</div>
+            <div><strong>${escapeHtml(testimonial.author)}</strong><span>${escapeHtml(testimonial.role) || 'همکار حرفه‌ای'}</span></div>
+        </div>
+    </article>
+    `;
+
+    const textElement = testimonialsGrid.querySelector('.testimonial-text');
+    const text = testimonial.text || '';
+    let characterIndex = 0;
+    const typeNextCharacter = () => {
+        textElement.textContent = text.slice(0, characterIndex++);
+        if (characterIndex <= text.length) {
+            setTimeout(typeNextCharacter, 18);
+        } else {
+            testimonialTimer = setTimeout(() => {
+                testimonialIndex = (testimonialIndex + 1) % testimonialsData.length;
+                renderTestimonials();
+            }, 3000);
+        }
+    };
+    typeNextCharacter();
 }
 
 function renderFilterBtns() {
@@ -205,6 +253,35 @@ contactForm.addEventListener('submit', async (e) => {
     }
 });
 
+testimonialForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    testimonialMessage.textContent = 'در حال ثبت نظر...';
+    testimonialMessage.style.color = 'var(--text2)';
+
+    try {
+        const response = await fetch(testimonialForm.action, {
+            method: 'POST',
+            body: new FormData(testimonialForm),
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            const firstError = Object.values(result.errors || {})[0];
+            throw new Error(firstError?.[0]?.message || 'لطفاً اطلاعات فرم را بررسی کنید.');
+        }
+
+        testimonialsData.unshift(result.testimonial);
+        testimonialIndex = 0;
+        renderTestimonials();
+        testimonialForm.reset();
+        testimonialMessage.textContent = result.message;
+        testimonialMessage.style.color = 'green';
+    } catch (error) {
+        testimonialMessage.textContent = error.message || 'ثبت نظر انجام نشد.';
+        testimonialMessage.style.color = 'red';
+    }
+});
+
 // ---------- THEME EVENTS ----------
 themeToggle.addEventListener('click', () => setTheme(currentTheme === 'dark' ? 'light' : 'dark'));
 printResume?.addEventListener('click', () => window.print());
@@ -232,6 +309,7 @@ function init() {
     renderExperience();
     renderProjects();
     renderCertificates();
+    renderTestimonials();
     renderStats();
     // observe fade-in
     const observer = new IntersectionObserver((entries) => {

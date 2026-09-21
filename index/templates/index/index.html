@@ -85,6 +85,43 @@
     </div>
   </section>
 
+  <section id="testimonials" class="testimonials-section">
+    <div class="container">
+      <div class="section-heading-row">
+        <div>
+          <span class="eyebrow">از زبان همکاران</span>
+          <h2 class="section-title">نظر همکاران</h2>
+        </div>
+        <span class="live-indicator"><span></span> زنده</span>
+      </div>
+      <div class="testimonials-layout">
+        <div class="testimonials-grid" id="testimonialsGrid"></div>
+        <div class="testimonial-form card">
+          <h3>تجربه همکاری‌تان را بنویسید</h3>
+          {% if user.is_authenticated %}
+          <p class="form-hint">نظر شما با نام حساب کاربری‌تان نمایش داده می‌شود.</p>
+          <form id="testimonialForm" action="{% url 'add_testimonial' username=owner.username %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="testimonialText">نظر شما</label>
+              <textarea id="testimonialText" name="text" maxlength="600" required placeholder="همکاری با ..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="testimonialRole">سمت یا شرکت <span>(اختیاری)</span></label>
+              <input type="text" id="testimonialRole" name="role" maxlength="120" placeholder="مثلاً مدیر محصول در ..." />
+            </div>
+            <button type="submit" class="btn">ثبت نظر</button>
+            <div class="form-message" id="testimonialMessage" role="status"></div>
+          </form>
+          {% else %}
+          <p class="form-hint">برای ثبت نظر همکاران، ابتدا وارد حساب کاربری خود شوید.</p>
+          <a class="btn" href="{% url 'login' %}?next={{ request.path|urlencode }}">ورود برای ثبت نظر</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="contact" class="contact-section">
     <div class="container">
       <h2 class="section-title">تماس با من</h2>

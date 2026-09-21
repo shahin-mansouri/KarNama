@@ -14,6 +14,7 @@ const htmlEl = document.documentElement;
 const navLinks = document.getElementById('navLinks');
 const hamburger = document.getElementById('hamburger');
 const themeToggle = document.getElementById('themeToggle');
+const printResume = document.getElementById('printResume');
 const backTop = document.getElementById('backTop');
 const scrollProgress = document.getElementById('scrollProgress');
 const skillsGrid = document.getElementById('skillsGrid');
@@ -37,7 +38,7 @@ function renderSkills() {
     skillsGrid.innerHTML = skillsData.map(s => `
     <div class="skill-item fade-in">
         <div class="name">${s.name}</div>
-        <div class="skill-bar"><div class="fill" style="width:0%" data-level="${s.level}"></div></div>
+        <div class="skill-bar"><div class="fill" style="width:0%; --skill-level:${s.level}%" data-level="${s.level}"></div></div>
     </div>
     `).join('');
     // animate fill
@@ -62,17 +63,32 @@ function renderExperience() {
 }
 
 // ---------- RENDER PROJECTS ----------
+function compactUrl(url) {
+    if (!url || url === '#') return '';
+    try {
+        const parsed = new URL(url, window.location.origin);
+        const path = parsed.pathname === '/' ? '' : parsed.pathname.replace(/\/$/, '');
+        return parsed.hostname.replace(/^www\./, '') + path;
+    } catch {
+        return url;
+    }
+}
+
 function renderProjects(filter = currentFilter) {
     const filtered = filter === 'all' ? projectsData : projectsData.filter(p => p.category === filter);
-    projectsGrid.innerHTML = filtered.map(p => `
+    projectsGrid.innerHTML = filtered.map(p => {
+        const github = p.github && p.github !== '#' ? `<a href="${p.github}" target="_blank" rel="noopener" data-print-url="${compactUrl(p.github)}">GitHub</a>` : '';
+        const demo = p.demo && p.demo !== '#' ? `<a href="${p.demo}" target="_blank" rel="noopener" data-print-url="${compactUrl(p.demo)}">Demo</a>` : '';
+        return `
     <div class="project-card card fade-in">
         <div class="img-wrap" aria-hidden="true"><div class="project-placeholder"><img src="${p.project_picture}" alt="${p.title}" /></div></div>
         <h3>${p.title}</h3>
         <div class="tech">${p.tech}</div>
         <p style="color:var(--text2);font-size:0.95rem;">${p.desc}</p>
-        <div class="links"><a href="${p.github}" target="_blank">GitHub</a><a href="${p.demo}" target="_blank">Demo</a></div>
+        <div class="links">${github}${demo}</div>
     </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function renderCertificates() {
@@ -81,7 +97,7 @@ function renderCertificates() {
         <h3>${certificate.name}</h3>
         <p class="certificate-issuer">${certificate.issuer}</p>
         ${certificate.date ? `<p class="certificate-date">${certificate.date}</p>` : ''}
-        ${certificate.link !== '#' ? `<a href="${certificate.link}" target="_blank" rel="noopener">مشاهده گواهینامه</a>` : ''}
+        ${certificate.link !== '#' ? `<a href="${certificate.link}" target="_blank" rel="noopener" data-print-url="${compactUrl(certificate.link)}">مشاهده گواهینامه</a>` : ''}
     </article>
     `).join('') : '<p class="empty-state">هنوز گواهینامه‌ای ثبت نشده است.</p>';
 }
@@ -191,6 +207,22 @@ contactForm.addEventListener('submit', async (e) => {
 
 // ---------- THEME EVENTS ----------
 themeToggle.addEventListener('click', () => setTheme(currentTheme === 'dark' ? 'light' : 'dark'));
+printResume?.addEventListener('click', () => window.print());
+
+window.addEventListener('beforeprint', () => {
+    renderProjects('all');
+    document.querySelectorAll('.skill-item .fill').forEach(el => {
+        el.style.width = el.dataset.level + '%';
+    });
+    document.querySelectorAll('.stat-item .num').forEach(el => {
+        el.textContent = el.dataset.count;
+    });
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+});
+window.addEventListener('afterprint', () => {
+    renderProjects(currentFilter);
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+});
 
 // ---------- INIT ----------
 function init() {

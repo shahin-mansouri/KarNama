@@ -20,9 +20,16 @@
           <h1>{{ portfolio_data.personal.name|default:'شاهین منصوری' }}</h1>
           <div class="title">{{ portfolio_data.personal.title|default:'توسعه‌دهنده نرم‌افزار' }}</div>
           <p>{{ portfolio_data.personal.bio|default:'عاشق ساخت تجربه‌های کاربری سریع، زیبا و در دسترس.' }}</p>
+          {% if owner.email or owner.phone_number or owner.address %}
+          <ul class="print-contact print-only">
+            {% if owner.email %}<li>{{ owner.email }}</li>{% endif %}
+            {% if owner.phone_number %}<li>{{ owner.phone_number }}</li>{% endif %}
+            {% if owner.address %}<li>{{ owner.address }}</li>{% endif %}
+          </ul>
+          {% endif %}
           <div class="hero-btns">
             <a href="#projects" class="btn">مشاهده پروژه‌ها</a>
-            <a href="/assets/documents/CV.pdf" download class="btn btn-outline">دانلود رزومه</a>
+            <button type="button" class="btn btn-outline print-resume-btn" id="printResume">چاپ / ذخیره PDF</button>
           </div>
           <div class="hero-social">
             <a href="#" aria-label="GitHub">🐙</a>
@@ -78,7 +85,7 @@
     </div>
   </section>
 
-  <section id="contact">
+  <section id="contact" class="contact-section">
     <div class="container">
       <h2 class="section-title">تماس با من</h2>
       <div class="contact-grid">

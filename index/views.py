@@ -27,7 +27,7 @@ class Index(TemplateView):
         profile = UserProfile.objects.filter(user=owner).first()
         about = AboutMe.objects.filter(user=owner).first()
         experience_data = []
-        for experience in experiences:
+        for experience in experiences[::-1]:
             experience_data.append({
                 'position': experience.position,
                 'company': experience.company_name,
@@ -63,7 +63,7 @@ class Index(TemplateView):
                     'demo': project.demo_link or '#',
                     'project_picture': project.project_picture.url if project.project_picture else '/static/index/images/project-placeholder.png',
                 }
-                for project in projects
+                for project in projects[::-1]
             ],
             'certificates': [
                 {

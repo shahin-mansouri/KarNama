@@ -1,5 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.contrib.auth.hashers import check_password, make_password
+from django.utils import timezone
+
+import secrets
+from datetime import timedelta
 
 
 class UserCustom(AbstractUser):
@@ -16,6 +21,51 @@ class UserCustom(AbstractUser):
     class Meta:
         verbose_name = 'کاربر'
         verbose_name_plural = 'کاربران'
+
+
+class OTPCode(models.Model):
+    phone_number = models.CharField(max_length=11, db_index=True, verbose_name='شماره تلفن')
+    code_hash = models.CharField(max_length=128, verbose_name='کد رمزنگاری‌شده')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')
+    expires_at = models.DateTimeField(verbose_name='زمان انقضا')
+    attempts = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد تلاش')
+    used_at = models.DateTimeField(null=True, blank=True, verbose_name='زمان مصرف')
+    session_key = models.CharField(max_length=40, blank=True, verbose_name='شناسه session')
+
+    MAX_ATTEMPTS = 5
+
+    @classmethod
+    def issue(cls, phone_number, session_key=''):
+        code = f'{secrets.randbelow(1000000):06d}'
+        otp = cls.objects.create(
+            phone_number=phone_number,
+            code_hash=make_password(code),
+            expires_at=timezone.now() + timedelta(minutes=5),
+            session_key=session_key or '',
+        )
+        return otp, code
+
+    def verify(self, code, session_key=''):
+        if self.used_at or timezone.now() >= self.expires_at:
+            return False
+        if self.session_key and self.session_key != session_key:
+            return False
+        if self.attempts >= self.MAX_ATTEMPTS:
+            return False
+
+        self.attempts += 1
+        valid = check_password(code, self.code_hash)
+        if valid:
+            self.used_at = timezone.now()
+            self.save(update_fields=('attempts', 'used_at'))
+        else:
+            self.save(update_fields=('attempts',))
+        return valid
+
+    class Meta:
+        ordering = ('-created_at',)
+        verbose_name = 'کد یکبارمصرف'
+        verbose_name_plural = 'کدهای یکبارمصرف'
 
 
 class UserProfile(models.Model):

@@ -54,10 +54,18 @@ class ExperienceForm(forms.ModelForm):
         labels = {'position': 'سمت شغلی', 'company_name': 'نام شرکت', 'start_date': 'تاریخ شروع', 'end_date': 'تاریخ پایان', 'description': 'توضیحات'}
         widgets = {'start_date': forms.DateInput(attrs={'type': 'date'}), 'end_date': forms.DateInput(attrs={'type': 'date'})}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['technologies'].initial = ', '.join(
+                self.instance.worktechuse_set.values_list('technology', flat=True)
+            )
+
     def save_with_technologies(self, user):
         experience = self.save(commit=False)
         experience.user = user
         experience.save()
+        WorkTechUse.objects.filter(work_experience=experience).delete()
         for technology in self.cleaned_data.get('technologies', '').split(','):
             technology = technology.strip()
             if technology:
@@ -72,6 +80,11 @@ class ProjectForm(forms.ModelForm):
         model = Project
         fields = ('name', 'technologies_used', 'description', 'github_link', 'demo_link', 'project_picture')
         labels = {'name': 'نام پروژه', 'technologies_used': 'فناوری‌های استفاده‌شده', 'description': 'توضیحات', 'github_link': 'لینک گیت‌هاب', 'demo_link': 'لینک نسخه نمایشی', 'project_picture': 'تصویر پروژه'}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk and self.instance.field_of_activity_id:
+            self.fields['field_name'].initial = self.instance.field_of_activity.name
 
     def save_with_user(self, user):
         project = self.save(commit=False)

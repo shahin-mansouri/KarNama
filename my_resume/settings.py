@@ -33,6 +33,10 @@ DEBUG = os.getenv('DEBUG', 'False').lower() in ('1', 'true', 'yes', 'on')
 
 ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', '').split(',') if host.strip()]
 
+SMS_API_KEY = os.getenv('SMS_API_KEY', '')
+SMS_TEMPLATE_ID = int(os.getenv('SMS_TEMPLATE_ID', '645434'))
+SMS_LINE_NUMBER = os.getenv('SMS_LINE_NUMBER') or None
+
 
 # Application definition
 

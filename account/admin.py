@@ -5,6 +5,7 @@ from .models import (
 	Certificate,
 	FieldOfActivity,
 	Language,
+	OTPCode,
 	Project,
 	Research,
 	SocialLink,
@@ -14,6 +15,15 @@ from .models import (
 	WorkExperience,
 	WorkTechUse,
 )
+
+
+@admin.register(OTPCode)
+class OTPCodeAdmin(admin.ModelAdmin):
+	list_display = ('id', 'phone_number', 'created_at', 'expires_at', 'attempts', 'used_at')
+	search_fields = ('phone_number',)
+	list_filter = ('used_at', 'created_at', 'expires_at')
+	readonly_fields = ('code_hash', 'created_at', 'expires_at', 'attempts', 'used_at', 'session_key')
+	list_per_page = 25
 
 
 @admin.register(UserCustom)

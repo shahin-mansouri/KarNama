@@ -1,20 +1,17 @@
-import secrets
-from datetime import timedelta
-
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-from django.utils import timezone
 from django.views.generic import CreateView
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 
+from .sms_sender import SMS
 from .forms import (
 	AboutMeForm, CertificateForm, ExperienceForm, OTPForm, PhoneForm,
 	LanguageForm, ProjectForm, ResearchForm, SignUpForm, SkillForm,
 	SocialLinkForm, UserDetailsForm, UserProfileForm,
 )
-from .models import AboutMe, Certificate, Language, Research, Skill, SocialLink, UserCustom, UserProfile, WorkExperience
+from .models import AboutMe, Certificate, Language, OTPCode, Project, Research, Skill, SocialLink, UserCustom, UserProfile, WorkExperience
 
 
 def normalize_phone(value):
@@ -30,23 +27,28 @@ def phone_login(request):
 			form = PhoneForm(request.POST)
 			if form.is_valid():
 				phone = normalize_phone(form.cleaned_data['phone_number'])
-				code = f'{secrets.randbelow(1000000):06d}'
-				request.session['otp_phone'] = phone
-				request.session['otp_code'] = code
-				request.session['otp_expires'] = (timezone.now() + timedelta(minutes=5)).isoformat()
-				request.session['otp_step'] = 'verify'
-				print(f'[KarNama OTP] {phone}: {code}')
-				messages.success(request, 'کد تأیید ارسال شد. در محیط توسعه کد در console نمایش داده می‌شود.')
-				return redirect('login')
+				request.session.cycle_key()
+				otp, code = OTPCode.issue(phone, request.session.session_key)
+				try:
+					response = SMS().send_code(phone, code)
+					if not 200 <= response.status_code < 300:
+						raise RuntimeError(f'SMS service returned HTTP {response.status_code}')
+				except Exception:
+					otp.delete()
+					messages.error(request, 'ارسال کد تأیید انجام نشد. لطفاً دوباره تلاش کنید.')
+				else:
+					request.session['otp_id'] = otp.pk
+					request.session['otp_step'] = 'verify'
+					messages.success(request, 'کد تأیید ارسال شد.')
+					return redirect('login')
 		else:
 			form = OTPForm(request.POST)
 			if form.is_valid():
-				expires = request.session.get('otp_expires', '')
-				valid_time = expires and timezone.now() < timezone.datetime.fromisoformat(expires)
-				if form.cleaned_data['code'] == request.session.get('otp_code') and valid_time:
-					phone = request.session['otp_phone']
+				otp = OTPCode.objects.filter(pk=request.session.get('otp_id')).first()
+				if otp and otp.verify(form.cleaned_data['code'], request.session.session_key):
+					phone = otp.phone_number
 					user = UserCustom.objects.filter(phone_number=phone).first()
-					for key in ('otp_code', 'otp_expires', 'otp_step'):
+					for key in ('otp_id', 'otp_step'):
 						request.session.pop(key, None)
 					if user:
 						login(request, user)
@@ -79,6 +81,9 @@ def onboarding(request):
 				user.set_unusable_password()
 				user.save()
 				login(request, user)
+				request.session.pop('onboarding_phone', None)
+				request.session.pop('onboarding_step', None)
+				return redirect('dashboard')
 			elif step == 1:
 				UserProfile.objects.update_or_create(user=request.user, defaults=form.cleaned_data)
 			elif step == 2:
@@ -113,6 +118,25 @@ def onboarding(request):
 	return render(request, 'account/onboarding.html', {'form': form, 'step': step + 1, 'total_steps': len(forms)})
 
 
+DASHBOARD_STEPS = ('user', 'profile', 'about', 'skill', 'experience', 'project', 'certificate', 'language', 'research', 'social')
+DASHBOARD_ITEMS = {
+	'skill': Skill,
+	'experience': WorkExperience,
+	'project': Project,
+	'certificate': Certificate,
+	'language': Language,
+	'research': Research,
+	'social': SocialLink,
+}
+
+
+def _owned_item(user, kind, item_id):
+	model = DASHBOARD_ITEMS.get(kind)
+	if not model or not item_id:
+		return None
+	return model.objects.filter(pk=item_id, user=user).first()
+
+
 @login_required
 def dashboard(request):
 	forms = {
@@ -123,43 +147,95 @@ def dashboard(request):
 		'project_form': ProjectForm(), 'certificate_form': CertificateForm(),
 		'language_form': LanguageForm(), 'research_form': ResearchForm(), 'social_form': SocialLinkForm(),
 	}
+	current_step = request.GET.get('step', 'user')
+	edit_item_id = request.GET.get('edit')
+	form_map = {'user': ('user_form', UserDetailsForm), 'profile': ('profile_form', UserProfileForm), 'about': ('about_form', AboutMeForm), 'skill': ('skill_form', SkillForm), 'experience': ('experience_form', ExperienceForm), 'project': ('project_form', ProjectForm), 'certificate': ('certificate_form', CertificateForm), 'language': ('language_form', LanguageForm), 'research': ('research_form', ResearchForm), 'social': ('social_form', SocialLinkForm)}
 	if request.method == 'POST':
 		action = request.POST.get('action')
-		form_map = {'user': ('user_form', UserDetailsForm), 'profile': ('profile_form', UserProfileForm), 'about': ('about_form', AboutMeForm), 'skill': ('skill_form', SkillForm), 'experience': ('experience_form', ExperienceForm), 'project': ('project_form', ProjectForm), 'certificate': ('certificate_form', CertificateForm), 'language': ('language_form', LanguageForm), 'research': ('research_form', ResearchForm), 'social': ('social_form', SocialLinkForm)}
+		if action == 'delete':
+			kind = request.POST.get('item_type')
+			obj = _owned_item(request.user, kind, request.POST.get('item_id'))
+			if obj:
+				obj.delete()
+				messages.success(request, 'مورد انتخاب‌شده حذف شد.')
+			return redirect(f"{reverse('dashboard')}?step={kind if kind in DASHBOARD_STEPS else 'user'}")
 		if action in form_map:
+			current_step = action
 			key, form_class = form_map[action]
-			instance = forms[key].instance if action in ('user', 'profile', 'about') else None
+			item = _owned_item(request.user, action, request.POST.get('item_id'))
+			instance = item if item is not None else (forms[key].instance if action in ('user', 'profile', 'about') else None)
+			if item is not None:
+				edit_item_id = str(item.pk)
 			form = form_class(request.POST, request.FILES, instance=instance)
 			if form.is_valid():
 				if action == 'user':
 					form.save()
 				elif action == 'profile':
-					form.save()
+					profile = form.save(commit=False)
+					profile.user = request.user
+					profile.save()
 				elif action == 'about':
-					form.save()
+					about = form.save(commit=False)
+					about.user = request.user
+					about.save()
 				elif action == 'experience':
 					form.save_with_technologies(request.user)
 				elif action == 'project':
 					form.save_with_user(request.user)
-				elif action in ('language', 'research', 'social'):
-					obj = form.save(commit=False)
-					obj.user = request.user
-					obj.save()
 				else:
 					obj = form.save(commit=False)
 					obj.user = request.user
 					obj.save()
 				messages.success(request, 'اطلاعات با موفقیت ذخیره شد.')
-				return redirect('dashboard')
+				return redirect(f"{reverse('dashboard')}?step={action}")
 			forms[key] = form
+	if current_step not in DASHBOARD_STEPS:
+		current_step = 'user'
+	if current_step in DASHBOARD_ITEMS and edit_item_id and request.method != 'POST':
+		item = _owned_item(request.user, current_step, edit_item_id)
+		if item:
+			key, form_class = form_map[current_step]
+			forms[key] = form_class(instance=item)
+			edit_item_id = str(item.pk)
+		else:
+			edit_item_id = None
+	elif request.method != 'POST':
+		edit_item_id = None
+
+	skills = Skill.objects.filter(user=request.user)
+	experiences = WorkExperience.objects.filter(user=request.user).prefetch_related('worktechuse_set')
+	projects = Project.objects.filter(user=request.user)
+	certificates = Certificate.objects.filter(user=request.user)
+	languages = Language.objects.filter(user=request.user)
+	researches = Research.objects.filter(user=request.user)
+	social_links = SocialLink.objects.filter(user=request.user)
+	profile = UserProfile.objects.filter(user=request.user).first()
+	about = AboutMe.objects.filter(user=request.user).first()
+	filled = [
+		bool(request.user.first_name and request.user.last_name),
+		bool(profile and profile.title),
+		bool(about and about.about_me),
+		skills.exists(),
+		experiences.exists(),
+		projects.exists(),
+		certificates.exists(),
+		languages.exists(),
+		researches.exists(),
+		social_links.exists(),
+	]
 	return render(request, 'account/dashboard.html', {
 		**forms,
-		'skills': Skill.objects.filter(user=request.user),
-		'experiences': WorkExperience.objects.filter(user=request.user),
-		'certificates': Certificate.objects.filter(user=request.user),
-		'languages': Language.objects.filter(user=request.user),
-		'researches': Research.objects.filter(user=request.user),
-		'social_links': SocialLink.objects.filter(user=request.user),
+		'skills': skills,
+		'experiences': experiences,
+		'projects': projects,
+		'certificates': certificates,
+		'languages': languages,
+		'researches': researches,
+		'social_links': social_links,
+		'current_step': current_step,
+		'edit_item_id': edit_item_id,
+		'completion_percent': int(sum(filled) / len(filled) * 100),
+		'total_steps': len(DASHBOARD_STEPS),
 	})
 
 

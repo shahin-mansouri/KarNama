@@ -69,7 +69,7 @@ function renderExperience() {
     <div class="timeline-item fade-in">
         <div class="date">${exp.start} — ${exp.end}</div>
         <h3>${exp.position}</h3>
-        <div class="company">${exp.company} · ${exp.location}</div>
+        <div class="company">${exp.company} · 📍${exp.location}</div>
         <div class="desc">${exp.desc}</div>
         <div class="tech-tags">${exp.techs.map(t => `<span>${t}</span>`).join('')}</div>
     </div>

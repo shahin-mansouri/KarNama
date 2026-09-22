@@ -76,6 +76,7 @@ class WorkExperience(models.Model):
     user = models.ForeignKey(UserCustom, on_delete=models.CASCADE, verbose_name='کاربر')
     position = models.CharField(max_length=100, verbose_name='سمت شغلی')
     company_name = models.CharField(max_length=100, verbose_name='نام شرکت')
+    address = models.TextField(blank=True, null=True, verbose_name='آدرس شرکت')
     start_date = models.DateField(verbose_name='تاریخ شروع')
     end_date = models.DateField(blank=True, null=True, verbose_name='تاریخ پایان')
     description = models.TextField(blank=True, null=True, verbose_name='توضیحات')

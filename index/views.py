@@ -42,7 +42,7 @@ class Index(TemplateView):
             experience_data.append({
                 'position': experience.position,
                 'company': experience.company_name,
-                'location': owner.address or '',
+                'location': experience.address or '',
                 'start': experience.start_date.year,
                 'end': experience.end_date.year if experience.end_date else 'اکنون',
                 'desc': experience.description or '',
@@ -104,7 +104,8 @@ class Index(TemplateView):
             'stats': {
                 'projects': projects.count(),
                 'experience': experiences.count(),
-                'technologies': WorkTechUse.objects.filter(work_experience__user=owner).count(),
+                # 'technologies': WorkTechUse.objects.filter(work_experience__user=owner).count(),
+                'technologies': skills.count(),
                 'certifications': certificates.count(),
             },
             'testimonials': [

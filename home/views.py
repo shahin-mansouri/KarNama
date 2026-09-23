@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.db.models import Case, IntegerField, Q, Value, When
 from django.views.generic import TemplateView
 
@@ -38,6 +39,17 @@ class ResumeBank(TemplateView):
         context['resume_count'] = paginator.count
         context['search_query'] = query
         return context
+
+
+def robots_txt(request):
+    content = "\n".join([
+        "User-agent: *",
+        "Disallow: /admin/",
+        "Disallow: /account/",
+        "Disallow: /messages/",
+        "Sitemap: https://karnamma.ir/sitemap.xml",
+    ])
+    return HttpResponse(content, content_type="text/plain")
 
 
 def _resume_queryset(query=''):

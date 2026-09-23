@@ -10,6 +10,15 @@
       <span class="eyebrow">نمایش توانایی‌ها</span>
       <h1>بانک رزومه</h1>
       <p>رزومه‌های حرفه‌ای اعضای کارنما را ببینید و مسیر کاری افراد مختلف را کشف کنید.</p>
+      <form class="resume-search resume-search-bank" method="get" action="{% url 'resume_bank' %}">
+        <label for="resume-bank-search">جست‌وجوی هوشمند رزومه</label>
+        <div class="resume-search-controls">
+          <input id="resume-bank-search" name="q" type="search" placeholder="نام، مهارت، عنوان شغلی یا فناوری" value="{{ search_query }}">
+          <button class="button button-dark" type="submit">جست‌وجو</button>
+          {% if search_query %}<a class="search-clear" href="{% url 'resume_bank' %}">پاک کردن</a>{% endif %}
+        </div>
+        <small>{% if search_query %}نتایج بر اساس نزدیک‌ترین ارتباط با عبارت شما مرتب شده‌اند.{% else %}با یک کلمه، مسیر حرفه‌ای مناسب خود را پیدا کنید.{% endif %}</small>
+      </form>
     </div>
   </section>
 
@@ -18,7 +27,7 @@
       <div class="resume-bank-heading">
         <div>
           <span class="section-kicker">رزومه‌های منتشرشده</span>
-          <h2>آدم‌های پشت مسیرهای حرفه‌ای</h2>
+          <h2>{% if search_query %}نتایج جست‌وجوی «{{ search_query }}»{% else %}آدم‌های پشت مسیرهای حرفه‌ای{% endif %}</h2>
         </div>
         <span class="resume-count">{{ resume_count }} رزومه</span>
       </div>

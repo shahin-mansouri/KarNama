@@ -16,6 +16,14 @@
           <a class="button button-accent" href="{% url 'login' %}">ساخت رزومه رایگان <span>←</span></a>
           <a class="outline-link" href="#blog">مطالب مسیر شغلی <span>↗</span></a>
         </div>
+        <form class="resume-search resume-search-home" method="get" action="{% url 'resume_bank' %}">
+          <label for="home-resume-search">دنبال چه تخصصی هستید؟</label>
+          <div class="resume-search-controls">
+            <input id="home-resume-search" name="q" type="search" placeholder="مثلاً برنامه‌نویس پایتون یا طراح محصول" value="{{ request.GET.q|default:'' }}">
+            <button class="button button-dark" type="submit">جست‌وجوی رزومه</button>
+          </div>
+          <small>در میان مهارت‌ها، تجربه‌ها و پروژه‌های افراد جست‌وجو کنید.</small>
+        </form>
         <div class="hero-note"><span class="note-dot"></span> شروع رایگان، بدون نیاز به کارت بانکی</div>
       </div>
       <div class="hero-board" aria-label="پیش‌نمایش رزومه">
@@ -24,6 +32,35 @@
         <div class="board-line wide"></div><div class="board-line"></div>
         <div class="board-columns"><div><b>مهارت‌ها</b><span></span><span></span><span></span></div><div><b>تجربه کاری</b><span class="long"></span><span class="long"></span></div></div>
         <div class="board-stamp">آماده ارسال</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="feature-section" id="successful-people">
+    <div class="home-container">
+      <div class="section-heading">
+        <span>افراد موفق</span>
+        <h2>مسیرهای حرفه‌ای الهام‌بخش</h2>
+      </div>
+      <div class="resume-grid">
+        {% for successful_person in successful_people %}
+          <article class="resume-card">
+            <div class="resume-card-top">
+              {% if successful_person.userprofile.profile_picture %}
+                <img src="{{ successful_person.userprofile.profile_picture.url }}" alt="{{ successful_person.get_full_name|default:successful_person.username }}" class="resume-avatar">
+              {% else %}
+                <div class="resume-avatar resume-avatar-placeholder">{{ successful_person.first_name|default:successful_person.username|first|upper }}</div>
+              {% endif %}
+              {% if forloop.first and successful_person.is_superuser %}<span class="resume-status">مدیر سایت</span>{% else %}<span class="resume-status">پروفایل منتخب</span>{% endif %}
+            </div>
+            <h3>{{ successful_person.get_full_name|default:successful_person.username }}</h3>
+            <p class="resume-title">{{ successful_person.userprofile.title }}</p>
+            <p class="resume-bio">{{ successful_person.userprofile.bio|default:'این کاربر هنوز معرفی کوتاهی ثبت نکرده است.'|truncatechars:140 }}</p>
+            <a class="resume-card-link" href="{% url 'profile' successful_person.username %}">مشاهده رزومه <span>←</span></a>
+          </article>
+        {% empty %}
+          <p>هنوز پروفایل عمومی برای نمایش ثبت نشده است.</p>
+        {% endfor %}
       </div>
     </div>
   </section>

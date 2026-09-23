@@ -5,8 +5,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}خانه | کارنما{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}رزومه حرفه‌ای خود را بسازید، یاد بگیرید و مسیر شغلی‌تان را بهتر ارائه کنید.{% endblock %}" />
+  <meta name="description" content="{% block meta_description %}در کارنما رزومه حرفه‌ای آنلاین بسازید، مهارت‌ها و تجربه‌های کاری خود را معرفی کنید و برای فرصت‌های شغلی بهتر آماده شوید.{% endblock %}" />
+  <link rel="canonical" href="https://karnamma.ir{{ request.path }}" />
+  <meta property="og:locale" content="fa_IR" />
+  <meta property="og:title" content="{% block og_title %}کارنما{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}رزومه حرفه‌ای خود را بسازید و مسیر شغلی‌تان را بهتر ارائه کنید.{% endblock %}" />
+  <meta property="og:image" content="https://karnamma.ir{% static 'home/image/logo.png' %}" />
+  <meta property="og:url" content="https://karnamma.ir{{ request.path }}" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="theme-color" content="#12211f" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
   {% block extra_head %}{% endblock %}
 </head>

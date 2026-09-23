@@ -2,7 +2,9 @@
 {% load static %}
 
 {% block title %}کارنما | رزومه‌ای برای قدم بعدی شما{% endblock %}
-{% block meta_description %}رزومه حرفه‌ای خود را بسازید، تجربه‌های شغلی‌تان را بهتر ارائه کنید و از راهنمایی‌های مسیر شغلی استفاده کنید.{% endblock %}
+{% block meta_description %}با کارنما یک رزومه حرفه‌ای آنلاین بسازید، تجربه‌ها و مهارت‌های خود را بهتر ارائه کنید و برای پیدا کردن فرصت شغلی مناسب آماده شوید.{% endblock %}
+{% block og_title %}کارنما | رزومه‌ای برای قدم بعدی شما{% endblock %}
+{% block og_description %}رزومه حرفه‌ای خود را بسازید، تجربه‌های شغلی‌تان را بهتر ارائه کنید و مسیر شغلی‌تان را توسعه دهید.{% endblock %}
 
 {% block content %}
 <main>
@@ -10,12 +12,13 @@
     <div class="home-container hero-layout">
       <div class="hero-copy">
         <span class="eyebrow">برای مسیر شغلی واقعی</span>
-        <h1>رزومه‌ای بسازید که <em>داستان شما</em> را درست روایت کند.</h1>
+        <h1>رزومه‌ای بسازید که <em id="heroTypedText">داستان شما</em> را درست روایت کند.</h1>
         <p>اطلاعات حرفه‌ای‌تان را یک‌جا مدیریت کنید، رزومه‌ای مرتب بسازید و از مطالب کاربردی برای قدم بعدی مسیر شغلی‌تان استفاده کنید.</p>
         <div class="hero-actions">
           <a class="button button-accent" href="{% url 'login' %}">ساخت رزومه رایگان <span>←</span></a>
           <a class="outline-link" href="#blog">مطالب مسیر شغلی <span>↗</span></a>
         </div>
+        <div class="hero-note"><span class="note-dot"></span>کاملا رایگان!</div>
         <form class="resume-search resume-search-home" method="get" action="{% url 'resume_bank' %}">
           <label for="home-resume-search">دنبال چه تخصصی هستید؟</label>
           <div class="resume-search-controls">
@@ -24,7 +27,6 @@
           </div>
           <small>در میان مهارت‌ها، تجربه‌ها و پروژه‌های افراد جست‌وجو کنید.</small>
         </form>
-        <div class="hero-note"><span class="note-dot"></span> شروع رایگان، بدون نیاز به کارت بانکی</div>
       </div>
       <div class="hero-board" aria-label="پیش‌نمایش رزومه">
         <div class="board-top"><span>پیش‌نمایش رزومه</span><i>•••</i></div>

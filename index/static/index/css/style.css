@@ -16,7 +16,7 @@
     --shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
     --radius: 20px;
     --transition: 0.3s cubic-bezier(.4,0,.2,1);
-    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font: 'Vazirmatn', 'Segoe UI', system-ui, -apple-system, sans-serif;
     --font-fa: 'Vazirmatn', 'Segoe UI', system-ui, sans-serif;
     --max-width: 1200px;
     --nav-height: 70px;

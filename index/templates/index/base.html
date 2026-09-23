@@ -5,16 +5,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}کارنما{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}نمونه‌کار و رزومه آنلاین شاهین منصوری، توسعه‌دهنده فرانت‌اند و بک‌اند.{% endblock %}" />
-  <link rel="canonical" href="https://yourdomain.com" />
-  <link rel="alternate" hreflang="fa" href="https://yourdomain.com" />
-  <meta property="og:title" content="شاهین منصوری | نمونه‌کار حرفه‌ای" />
-  <meta property="og:description" content="نمونه‌کار و رزومه آنلاین شاهین منصوری، توسعه‌دهنده فرانت‌اند و بک‌اند." />
-  <meta property="og:image" content="https://yourdomain.com/assets/images/og-image.jpg" />
-  <meta property="og:url" content="https://yourdomain.com" />
+  <meta name="description" content="{% block meta_description %}رزومه و نمونه‌کار حرفه‌ای خود را در کارنما معرفی کنید و مهارت‌ها، تجربه‌های کاری و پروژه‌هایتان را با کارفرماها به اشتراک بگذارید.{% endblock %}" />
+  <link rel="canonical" href="https://karnamma.ir{{ request.path }}" />
+  <link rel="alternate" hreflang="fa" href="https://karnamma.ir{{ request.path }}" />
+  <meta property="og:locale" content="fa_IR" />
+  <meta property="og:title" content="{% block og_title %}کارنما{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}نمونه‌کار و رزومه آنلاین در کارنما.{% endblock %}" />
+  <meta property="og:image" content="https://karnamma.ir{% static 'index/image/logo.png' %}" />
+  <meta property="og:url" content="https://karnamma.ir{{ request.path }}" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="theme-color" content="#0f172a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍💻</text></svg>" />
   <link rel="stylesheet" href="{% static 'index/css/style.css' %}">
   {% block extra_head %}{% endblock %}
@@ -25,7 +29,7 @@
   <header class="navbar" role="banner">
     <div class="container">
       <!-- <a href="#" class="nav-logo">K<span>N</span></a> -->
-      <a href="{% url 'home' %}"><img style="width: 85px;" src="{% static 'index/image/logo.png' %}" alt="" srcset=""></a>
+      <a href="{% url 'home' %}"><img style="width: 85px;" src="{% static 'index/image/logo.png' %}" alt="کارنما" /></a>
 
       <nav aria-label="Main navigation">
         <ul class="nav-links" id="navLinks" role="menubar">

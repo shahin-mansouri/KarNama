@@ -1,8 +1,10 @@
 ﻿{% extends 'index/base.html' %}
 {% load static %}
 
-{% block title %}شاهین منصوری | نمونه‌کار حرفه‌ای{% endblock %}
-{% block meta_description %}نمونه‌کار و رزومه آنلاین شاهین منصوری، توسعه‌دهنده فرانت‌اند و بک‌اند.{% endblock %}
+{% block title %}{{ owner.get_full_name|default:owner.username }} | رزومه و نمونه‌کار حرفه‌ای{% endblock %}
+{% block meta_description %}رزومه آنلاین {{ owner.get_full_name|default:owner.username }}، {{ portfolio_data.personal.title }}؛ مشاهده مهارت‌ها، تجربه‌های کاری، پروژه‌ها و راه‌های ارتباطی در کارنما.{% endblock %}
+{% block og_title %}{{ owner.get_full_name|default:owner.username }} | رزومه و نمونه‌کار حرفه‌ای{% endblock %}
+{% block og_description %}رزومه آنلاین {{ owner.get_full_name|default:owner.username }} در کارنما؛ مهارت‌ها، تجربه‌های کاری و پروژه‌ها.{% endblock %}
 
 {% block content %}
 <main>

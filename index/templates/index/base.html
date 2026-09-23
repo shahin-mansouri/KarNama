@@ -29,6 +29,7 @@
 
       <nav aria-label="Main navigation">
         <ul class="nav-links" id="navLinks" role="menubar">
+          {% if request.user.is_authenticated and request.user.pk == owner.pk %}<li role="none"><a href="{% url 'dashboard' %}" role="menuitem">ویرایش</a></li>{% endif %}
           <li role="none"><a href="#hero" role="menuitem">خانه</a></li>
           <li role="none"><a href="#about" role="menuitem">درباره</a></li>
           <li role="none"><a href="#skills" role="menuitem">مهارت‌ها</a></li>

@@ -1,10 +1,39 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.contrib.auth.hashers import check_password, make_password
+from django.core.files.base import ContentFile
 from django.utils import timezone
 
+from io import BytesIO
 import secrets
 from datetime import timedelta
+from uuid import uuid4
+
+from PIL import Image
+
+
+class WebPImageModelMixin:
+    image_field_name = None
+
+    def _convert_image_to_webp(self):
+        image_field = getattr(self, self.image_field_name)
+        if not image_field or image_field._committed:
+            return
+
+        image_field.file.seek(0)
+        with Image.open(image_field.file) as image:
+            if image.mode not in ('RGB', 'RGBA'):
+                image = image.convert('RGBA' if 'A' in image.getbands() else 'RGB')
+
+            converted_image = BytesIO()
+            image.save(converted_image, format='WEBP', quality=85, method=6)
+
+        filename = f'{uuid4().hex}.webp'
+        image_field.save(filename, ContentFile(converted_image.getvalue(), name=filename), save=False)
+
+    def save(self, *args, **kwargs):
+        self._convert_image_to_webp()
+        return super().save(*args, **kwargs)
 
 
 class UserCustom(AbstractUser):
@@ -68,7 +97,8 @@ class OTPCode(models.Model):
         verbose_name_plural = 'کدهای یکبارمصرف'
 
 
-class UserProfile(models.Model):
+class UserProfile(WebPImageModelMixin, models.Model):
+    image_field_name = 'profile_picture'
 
     MARITAL_STATUS_CHOICES = (
         ('single', 'مجرد'),
@@ -157,7 +187,8 @@ class FieldOfActivity(models.Model):
         verbose_name = 'حوزه فعالیت'
         verbose_name_plural = 'حوزه‌های فعالیت'
 
-class Project(models.Model):
+class Project(WebPImageModelMixin, models.Model):
+    image_field_name = 'project_picture'
     field_of_activity = models.ForeignKey(FieldOfActivity, on_delete=models.CASCADE, verbose_name='حوزه فعالیت')
     user = models.ForeignKey(UserCustom, on_delete=models.CASCADE, verbose_name='کاربر')
     name = models.CharField(max_length=100, verbose_name='نام پروژه')

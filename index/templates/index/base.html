@@ -11,7 +11,7 @@
   <meta property="og:locale" content="fa_IR" />
   <meta property="og:title" content="{% block og_title %}کارنما{% endblock %}" />
   <meta property="og:description" content="{% block og_description %}نمونه‌کار و رزومه آنلاین در کارنما.{% endblock %}" />
-  <meta property="og:image" content="https://karnamma.ir{% static 'index/image/logo.png' %}" />
+  <meta property="og:image" content="https://karnamma.ir{% static 'index/image/logo.ico' %}" />
   <meta property="og:url" content="https://karnamma.ir{{ request.path }}" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -29,7 +29,7 @@
   <header class="navbar" role="banner">
     <div class="container">
       <!-- <a href="#" class="nav-logo">K<span>N</span></a> -->
-      <a href="{% url 'home' %}"><img style="width: 85px;" src="{% static 'index/image/logo.png' %}" alt="کارنما" /></a>
+      <a href="{% url 'home' %}"><img src="{% static 'home/image/logo.ico' %}" alt="کارنما" /></a>
 
       <nav aria-label="Main navigation">
         <ul class="nav-links" id="navLinks" role="menubar">

@@ -48,6 +48,13 @@
             <h3>{{ resume_user.get_full_name|default:resume_user.username }}</h3>
             <p class="resume-title">{{ resume_user.userprofile.title }}</p>
             <p class="resume-bio">{{ resume_user.userprofile.bio|default:'این کاربر هنوز معرفی کوتاهی ثبت نکرده است.'|truncatechars:140 }}</p>
+            {% with skills=resume_user.skill_set.all %}
+              {% if skills %}
+                <div class="resume-skills">
+                  {% for skill in skills|slice:':3' %}<span>{{ skill.name }}</span>{% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
             <a class="resume-card-link" href="{% url 'profile' resume_user.username %}">مشاهده رزومه <span>←</span></a>
           </article>
         {% empty %}
@@ -60,21 +67,21 @@
       </div>
 
       {% if page_obj.has_other_pages %}
-        <nav class="pagination" aria-label="pagination">
+        <nav class="pagination" aria-label="صفحه‌بندی">
           {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+            <a href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ page_obj.previous_page_number }}">قبلی</a>
           {% endif %}
 
           {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
               <span class="current-page">{{ num }}</span>
             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-              <a href="?page={{ num }}">{{ num }}</a>
+              <a href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ num }}">{{ num }}</a>
             {% endif %}
           {% endfor %}
 
           {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">بعدی</a>
+            <a href="?{% if search_query %}q={{ search_query }}&{% endif %}page={{ page_obj.next_page_number }}">بعدی</a>
           {% endif %}
         </nav>
       {% endif %}

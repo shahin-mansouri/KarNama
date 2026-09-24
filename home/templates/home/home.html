@@ -9,9 +9,10 @@
 {% block content %}
 <main>
   <section class="home-hero" id="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
     <div class="home-container hero-layout">
       <div class="hero-copy">
-        <span class="eyebrow">برای مسیر شغلی واقعی</span>
+        <span class="eyebrow">پلتفرم رزومه آنلاین</span>
         <h1>رزومه‌ای بسازید که <em id="heroTypedText">داستان شما</em> را درست روایت کند.</h1>
         <p>اطلاعات حرفه‌ای‌تان را یک‌جا مدیریت کنید، رزومه‌ای مرتب بسازید و از مطالب کاربردی برای قدم بعدی مسیر شغلی‌تان استفاده کنید.</p>
         <div class="hero-actions">
@@ -19,6 +20,11 @@
           <a class="outline-link" href="#blog">مطالب مسیر شغلی <span>↗</span></a>
         </div>
         <div class="hero-note"><span class="note-dot"></span>کاملا رایگان!</div>
+        <ul class="hero-stats" aria-label="نکات کلیدی">
+          <li><strong>۳ دقیقه</strong><span>تا اولین نسخه رزومه</span></li>
+          <li><strong>آنلاین</strong><span>قابل اشتراک با یک لینک</span></li>
+          <li><strong>به‌روز</strong><span>ویرایش هر زمان که بخواهید</span></li>
+        </ul>
         <form class="resume-search resume-search-home" method="get" action="{% url 'resume_bank' %}">
           <label for="home-resume-search">دنبال چه تخصصی هستید؟</label>
           <div class="resume-search-controls">
@@ -32,6 +38,7 @@
         <div class="board-top"><span>پیش‌نمایش رزومه</span><i>•••</i></div>
         <div class="board-profile"><div class="profile-mark">ش</div><div><strong>شاهین منصوری</strong><small>توسعه‌دهنده نرم‌افزار</small></div></div>
         <div class="board-line wide"></div><div class="board-line"></div>
+        <div class="board-pills"><span>Python</span><span>Django</span><span>Product</span></div>
         <div class="board-columns"><div><b>مهارت‌ها</b><span></span><span></span><span></span></div><div><b>تجربه کاری</b><span class="long"></span><span class="long"></span></div></div>
         <div class="board-stamp">آماده ارسال</div>
       </div>
@@ -58,6 +65,13 @@
             <h3>{{ successful_person.get_full_name|default:successful_person.username }}</h3>
             <p class="resume-title">{{ successful_person.userprofile.title }}</p>
             <p class="resume-bio">{{ successful_person.userprofile.bio|default:'این کاربر هنوز معرفی کوتاهی ثبت نکرده است.'|truncatechars:140 }}</p>
+            {% with skills=successful_person.skill_set.all %}
+              {% if skills %}
+                <div class="resume-skills">
+                  {% for skill in skills|slice:':3' %}<span>{{ skill.name }}</span>{% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
             <a class="resume-card-link" href="{% url 'profile' successful_person.username %}">مشاهده رزومه <span>←</span></a>
           </article>
         {% empty %}
@@ -67,12 +81,109 @@
     </div>
   </section>
 
-  <section class="feature-section" id="features"><div class="home-container"><div class="section-heading"><span>همه‌چیز در یک نگاه</span><h2>ابزارهای ساده برای ارائه بهتر شما</h2></div><div class="feature-grid"><article><b>01</b><h3>پروفایل حرفه‌ای</h3><p>اطلاعات کاری، مهارت‌ها و پروژه‌های خود را در یک صفحه قابل اشتراک نگه دارید.</p></article><article><b>02</b><h3>ویرایش سریع</h3><p>هر زمان شغل یا مهارت جدیدی اضافه شد، رزومه‌تان را بدون شروع دوباره به‌روز کنید.</p></article><article><b>03</b><h3>خروجی آماده ارسال</h3><p>رزومه شما با ساختاری خوانا و مناسب برای ارسال به کارفرما آماده می‌شود.</p></article></div></div></section>
+  <section class="feature-section" id="features">
+    <div class="home-container">
+      <div class="section-heading">
+        <span>همه‌چیز در یک نگاه</span>
+        <h2>ابزارهای ساده برای ارائه بهتر شما</h2>
+      </div>
+      <div class="feature-grid">
+        <article>
+          <b>01</b>
+          <h3>پروفایل حرفه‌ای</h3>
+          <p>اطلاعات کاری، مهارت‌ها و پروژه‌های خود را در یک صفحه قابل اشتراک نگه دارید.</p>
+        </article>
+        <article>
+          <b>02</b>
+          <h3>ویرایش سریع</h3>
+          <p>هر زمان شغل یا مهارت جدیدی اضافه شد، رزومه‌تان را بدون شروع دوباره به‌روز کنید.</p>
+        </article>
+        <article>
+          <b>03</b>
+          <h3>خروجی آماده ارسال</h3>
+          <p>رزومه شما با ساختاری خوانا و مناسب برای ارسال به کارفرما آماده می‌شود.</p>
+        </article>
+      </div>
+    </div>
+  </section>
 
-  <section class="steps-section" id="steps"><div class="home-container"><div class="section-heading"><span>مسیر کوتاه‌تر</span><h2>از اطلاعات خام تا رزومه آماده</h2></div><div class="steps-grid"><div><strong>۱</strong><h3>ثبت‌نام کنید</h3><p>حساب خود را در چند ثانیه بسازید.</p></div><div><strong>۲</strong><h3>اطلاعات را وارد کنید</h3><p>تجربه و توانایی‌هایتان را کامل کنید.</p></div><div><strong>۳</strong><h3>رزومه را منتشر کنید</h3><p>صفحه حرفه‌ای خود را با دیگران به اشتراک بگذارید.</p></div></div></div></section>
+  <section class="steps-section" id="steps">
+    <div class="home-container">
+      <div class="section-heading">
+        <span>مسیر کوتاه‌تر</span>
+        <h2>از اطلاعات خام تا رزومه آماده</h2>
+      </div>
+      <div class="steps-grid">
+        <div>
+          <strong>۱</strong>
+          <h3>ثبت‌نام کنید</h3>
+          <p>حساب خود را در چند ثانیه بسازید.</p>
+        </div>
+        <div>
+          <strong>۲</strong>
+          <h3>اطلاعات را وارد کنید</h3>
+          <p>تجربه و توانایی‌هایتان را کامل کنید.</p>
+        </div>
+        <div>
+          <strong>۳</strong>
+          <h3>رزومه را منتشر کنید</h3>
+          <p>صفحه حرفه‌ای خود را با دیگران به اشتراک بگذارید.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <section class="blog-section" id="blog"><div class="home-container"><div class="blog-heading"><div class="section-heading"><span>Blog / یادداشت‌های مسیر</span><h2>هر روز چیزی برای بهتر شدن</h2><p>راهنماهای کوتاه و کاربردی درباره رزومه، مصاحبه و رشد شغلی.</p></div><a class="outline-link" href="#blog">همه مطالب <span>↗</span></a></div><div class="category-row">{% for category in blog_categories %}<span>{{ category }}</span>{% empty %}<span>رزومه</span><span>مصاحبه شغلی</span><span>رشد حرفه‌ای</span>{% endfor %}</div><div class="post-grid">{% for post in latest_posts %}<article class="post-card"><div class="post-meta"><span>{{ post.category }}</span><time>{{ post.published_at|date:'j F Y' }}</time></div><h3>{{ post.title }}</h3><p>{{ post.excerpt }}</p><a href="#blog">ادامه مطلب <span>←</span></a></article>{% empty %}<article class="post-card post-empty"><span class="post-number">تازه</span><h3>چطور رزومه‌ای بنویسیم که خوانده شود؟</h3><p>به‌زودی اولین یادداشت‌های کاربردی درباره ساخت رزومه و مسیر شغلی منتشر می‌شوند.</p><a href="{% url 'login' %}">عضو شوید تا باخبر بمانید <span>←</span></a></article><article class="post-card post-empty"><span class="post-number">۰۲</span><h3>مهارت‌ها را چطور به تجربه تبدیل کنیم؟</h3><p>موضوعات متنوعی برای یادگیری و پیشرفت روزانه در Blog منتشر خواهد شد.</p><a href="#blog">دنبال کردن Blog <span>←</span></a></article>{% endfor %}</div></div></section>
+  <section class="blog-section" id="blog">
+    <div class="home-container">
+      <div class="blog-heading">
+        <div class="section-heading">
+          <span>Blog / یادداشت‌های مسیر</span>
+          <h2>هر روز چیزی برای بهتر شدن</h2>
+          <p>راهنماهای کوتاه و کاربردی درباره رزومه، مصاحبه و رشد شغلی.</p>
+        </div>
+        <a class="outline-link" href="#blog">همه مطالب <span>↗</span></a>
+      </div>
+      <div class="category-row">
+        {% for category in blog_categories %}
+          <span>{{ category }}</span>
+        {% empty %}
+          <span>رزومه</span>
+          <span>مصاحبه شغلی</span>
+          <span>رشد حرفه‌ای</span>
+        {% endfor %}
+      </div>
+      <div class="post-grid">
+        {% for post in latest_posts %}
+          <article class="post-card">
+            <div class="post-meta"><span>{{ post.category }}</span><time>{{ post.published_at|date:'j F Y' }}</time></div>
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.excerpt }}</p>
+            <a href="#blog">ادامه مطلب <span>←</span></a>
+          </article>
+        {% empty %}
+          <article class="post-card post-empty">
+            <span class="post-number">تازه</span>
+            <h3>چطور رزومه‌ای بنویسیم که خوانده شود؟</h3>
+            <p>به‌زودی اولین یادداشت‌های کاربردی درباره ساخت رزومه و مسیر شغلی منتشر می‌شوند.</p>
+            <a href="{% url 'login' %}">عضو شوید تا باخبر بمانید <span>←</span></a>
+          </article>
+          <article class="post-card post-empty">
+            <span class="post-number">۰۲</span>
+            <h3>مهارت‌ها را چطور به تجربه تبدیل کنیم؟</h3>
+            <p>موضوعات متنوعی برای یادگیری و پیشرفت روزانه در Blog منتشر خواهد شد.</p>
+            <a href="#blog">دنبال کردن Blog <span>←</span></a>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
 
-  <section class="home-cta"><div class="home-container"><span>قدم بعدی شما از همین‌جا شروع می‌شود.</span><h2>رزومه‌تان را امروز بسازید.</h2><a class="button button-accent" href="{% url 'login' %}">شروع رایگان <span>←</span></a></div></section>
+  <section class="home-cta">
+    <div class="home-container">
+      <span>قدم بعدی شما از همین‌جا شروع می‌شود.</span>
+      <h2>رزومه‌تان را امروز بسازید.</h2>
+      <a class="button button-accent" href="{% url 'login' %}">شروع رایگان <span>←</span></a>
+    </div>
+  </section>
 </main>
 {% endblock %}

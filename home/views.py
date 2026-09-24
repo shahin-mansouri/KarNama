@@ -57,6 +57,7 @@ def _resume_queryset(query=''):
         UserCustom.objects
         .filter(is_active=True, userprofile__isnull=False)
         .select_related('userprofile')
+        .prefetch_related('skill_set')
     )
 
     if query:

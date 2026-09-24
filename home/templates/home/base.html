@@ -33,7 +33,7 @@
       <nav class="home-nav" aria-label="ناوبری اصلی">
         <a href="{% url 'home' %}#features">قابلیت‌ها</a>
         <a href="{% url 'resume_bank' %}">بانک رزومه</a>
-        <a href="{% url 'home' %}#blog">Blog</a>
+        <a href="{% url 'blog_list' %}">Blog</a>
         <a href="{% url 'home' %}#steps">چطور کار می‌کند؟</a>
         <div class="account-actions">
           {% if user.is_authenticated %}
@@ -71,7 +71,7 @@
       <nav class="footer-links" aria-label="لینک‌های فوتر">
         <a href="{% url 'home' %}#features">قابلیت‌ها</a>
         <a href="{% url 'resume_bank' %}">بانک رزومه</a>
-        <a href="{% url 'home' %}#blog">Blog</a>
+        <a href="{% url 'blog_list' %}">Blog</a>
         <a href="{% url 'login' %}">ورود / ثبت‌نام</a>
       </nav>
       <p class="footer-copy">&copy; 2026 کارنما. همه حقوق محفوظ است.</p>

@@ -1,0 +1,18 @@
+{% extends 'home/base.html' %}
+
+{% block title %}{{ post.title }} | کارنما{% endblock %}
+{% block meta_description %}{{ post.excerpt }}{% endblock %}
+{% block og_title %}{{ post.title }} | کارنما{% endblock %}
+{% block og_description %}{{ post.excerpt }}{% endblock %}
+
+{% block content %}
+<main class="blog-section">
+  <article class="home-container blog-article">
+    <div class="post-meta"><span>{{ post.category }}</span><time>{{ post.published_at|date:'j F Y' }}</time></div>
+    <h1>{{ post.title }}</h1>
+    <p class="blog-article-excerpt">{{ post.excerpt }}</p>
+    <div class="blog-article-content">{{ post.content|linebreaks }}</div>
+    <a class="outline-link" href="{% url 'blog_list' %}">بازگشت به همه مطالب <span>←</span></a>
+  </article>
+</main>
+{% endblock %}

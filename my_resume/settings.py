@@ -37,6 +37,9 @@ SMS_API_KEY = os.getenv('SMS_API_KEY', '')
 SMS_TEMPLATE_ID = int(os.getenv('SMS_TEMPLATE_ID', '645434'))
 SMS_LINE_NUMBER = os.getenv('SMS_LINE_NUMBER') or None
 
+DASHSCOPE_API_KEY = os.getenv('DASHSCOPE_API_KEY')
+DASHSCOPE_MODEL = os.getenv('DASHSCOPE_MODEL', 'qwen3.8-max')
+
 
 # Application definition
 

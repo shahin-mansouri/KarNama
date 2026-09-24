@@ -1,6 +1,7 @@
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.db.models import Case, IntegerField, Q, Value, When
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView
 
 from account.models import UserCustom
@@ -39,6 +40,22 @@ class ResumeBank(TemplateView):
         context['resume_count'] = paginator.count
         context['search_query'] = query
         return context
+
+
+def blog_list(request):
+    posts = BlogPost.objects.filter(is_published=True)
+    paginator = Paginator(posts, 5)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, 'home/blog.html', {
+        'page_obj': page_obj,
+        'blog_posts': page_obj.object_list,
+        'blog_categories': posts.values_list('category', flat=True).distinct()[:6],
+    })
+
+
+def blog_detail(request, slug):
+    post = get_object_or_404(BlogPost, slug=slug, is_published=True)
+    return render(request, 'home/blog_detail.html', {'post': post})
 
 
 def robots_txt(request):

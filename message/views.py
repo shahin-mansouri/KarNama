@@ -1,11 +1,31 @@
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
 from account.models import UserCustom
 
 from .forms import ContactMessageForm, TestimonialForm
+from .models import ContactMessage
+
+
+@login_required
+def message_list(request):
+	messages = ContactMessage.objects.filter(recipient=request.user)
+	return render(request, 'message/message.html', {'messages': messages})
+
+
+@login_required
+def message_detail(request, pk):
+	contact_message = get_object_or_404(
+		ContactMessage,
+		pk=pk,
+		recipient=request.user,
+	)
+	if not contact_message.is_read:
+		contact_message.is_read = True
+		contact_message.save(update_fields=('is_read',))
+	return render(request, 'message/message_detail.html', {'message': contact_message})
 
 
 @require_POST

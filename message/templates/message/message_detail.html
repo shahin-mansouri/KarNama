@@ -1,0 +1,20 @@
+{% extends 'message/base.html' %}
+
+{% block title %}{{ message.subject }} | پیام‌ها{% endblock %}
+
+{% block content %}
+<main class="message-page">
+  <div class="home-container">
+    <a class="message-back-link" href="{% url 'message_list' %}">→ بازگشت به پیام‌ها</a>
+    <article class="message-detail">
+      <div class="message-detail-meta">
+        <span>{{ message.name }}</span>
+        <time datetime="{{ message.created_at|date:'c' }}">{{ message.created_at|date:'Y/m/d H:i' }}</time>
+      </div>
+      <h1>{{ message.subject }}</h1>
+      <a class="message-email" href="mailto:{{ message.email }}">{{ message.email }}</a>
+      <p>{{ message.message|linebreaksbr }}</p>
+    </article>
+  </div>
+</main>
+{% endblock %}

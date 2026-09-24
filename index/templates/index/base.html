@@ -48,6 +48,12 @@
         </ul>
       </nav>
       <div class="nav-actions">
+        {% if request.user.is_authenticated %}
+          <a class="notification-link" href="{% url 'message_list' %}" aria-label="پیام‌ها{% if unread_message_count %}، {{ unread_message_count }} پیام خوانده‌نشده{% endif %}">
+            <span aria-hidden="true">🔔</span>
+            {% if unread_message_count %}<b>{{ unread_message_count }}</b>{% endif %}
+          </a>
+        {% endif %}
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
         <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
           <span></span><span></span><span></span>

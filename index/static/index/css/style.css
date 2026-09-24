@@ -181,6 +181,32 @@ body.fa .section-title::after { inset-inline-start: 0; }
     align-items: center;
     gap: 8px;
 }
+.notification-link {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: var(--text2);
+    font-size: 1.05rem;
+    transition: background var(--transition), color var(--transition);
+}
+.notification-link:hover { color: var(--primary); background: var(--surface2); }
+.notification-link b {
+    position: absolute;
+    top: -2px;
+    inset-inline-end: -3px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #d97706;
+    color: #fff;
+    font-size: .65rem;
+    line-height: 18px;
+    text-align: center;
+}
 .theme-toggle {
     background: transparent;
     border: none;

@@ -1,0 +1,32 @@
+{% extends 'message/base.html' %}
+
+{% block title %}پیام‌ها | کارنما{% endblock %}
+
+{% block content %}
+<main class="message-page">
+	<div class="home-container">
+		<div class="message-page-heading">
+			<span class="section-kicker">صندوق ورودی</span>
+			<h1>پیام‌های شما</h1>
+			<p>پیام‌های دریافت‌شده از بازدیدکنندگان رزومه‌تان.</p>
+		</div>
+
+		{% if messages %}
+			<div class="message-list">
+				{% for contact_message in messages %}
+					<a class="message-item{% if not contact_message.is_read %} is-unread{% endif %}" href="{% url 'message_detail' contact_message.pk %}">
+						<span class="message-item-status" aria-hidden="true"></span>
+						<span class="message-item-content">
+							<strong>{{ contact_message.subject }}</strong>
+							<span>{{ contact_message.name }} · {{ contact_message.created_at|date:'Y/m/d H:i' }}</span>
+						</span>
+						<span class="message-item-arrow" aria-hidden="true">←</span>
+					</a>
+				{% endfor %}
+			</div>
+		{% else %}
+			<div class="message-empty">هنوز پیامی دریافت نکرده‌اید.</div>
+		{% endif %}
+	</div>
+</main>
+{% endblock %}

@@ -20,12 +20,13 @@ from django.conf import settings
 from django.urls import path, include
 from django.conf.urls.static import static
 
-from home.sitemaps import ProfileSitemap, StaticViewSitemap
+from home.sitemaps import BlogPostSitemap, ProfileSitemap, StaticViewSitemap
 from home.views import robots_txt
 
 
 sitemaps = {
     "static": StaticViewSitemap,
+    "blog_posts": BlogPostSitemap,
     "profiles": ProfileSitemap,
 }
 

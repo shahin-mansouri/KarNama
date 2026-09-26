@@ -3,7 +3,7 @@ import random
 import dashscope
 from django.utils.text import slugify
 from django.utils import timezone
-from home.models import BlogPost
+from home.models import BlogPost, Category
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
@@ -14,7 +14,23 @@ class Command(BaseCommand):
     help = "Generate a blog post using Qwen"
 
     def handle(self, *args, **options):
-        # کد تولید مقاله اینجا
+        blog = blog_generator()
+        blog_json = json.loads(blog)
+        category_name = blog_json["category"]
+        category, _ = Category.objects.get_or_create(
+            name=category_name,
+            defaults={"slug": slugify(category_name, allow_unicode=True)},
+        )
+
+        BlogPost.objects.create(
+            title=blog_json["title"],
+            slug=slugify(blog_json["title"], allow_unicode=True),
+            excerpt=blog_json["excerpt"],
+            content=blog_json["content"],
+            category=category,
+            published_at=timezone.now(),
+            is_published=True,
+        )
         self.stdout.write("Blog generated successfully.")
 
 
@@ -65,29 +81,3 @@ def build_prompt(categorie):
                 """.strip()
 
 
-print('start')
-blog = blog_generator()
-# print('line 74')
-# print(blog)
-blog_json = json.loads(blog)
-
-# print(
-#     json.dumps(
-#         blog_json,
-#         ensure_ascii=False,
-#         indent=4
-#     )
-# )
-
-
-BlogPost.objects.create(
-    title=blog_json["title"],
-    slug=slugify(blog_json["title"], allow_unicode=True),
-    excerpt=blog_json["excerpt"],
-    content=blog_json["content"],
-    category=blog_json["category"],
-    published_at=timezone.now(),
-    is_published=True,
-)
-
-print('published.')

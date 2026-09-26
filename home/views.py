@@ -6,7 +6,7 @@ from django.views.generic import TemplateView
 
 from account.models import UserCustom
 
-from .models import BlogPost
+from .models import BlogPost, Category
 
 
 class Home(TemplateView):
@@ -15,11 +15,7 @@ class Home(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['latest_posts'] = BlogPost.objects.filter(is_published=True)[:3]
-        context['blog_categories'] = (
-            BlogPost.objects.filter(is_published=True)
-            .values_list('category', flat=True)
-            .distinct()[:6]
-        )
+        context['blog_categories'] = Category.objects.all()
         context['successful_people'] = _resume_queryset()[:3]
         return context
 
@@ -44,12 +40,12 @@ class ResumeBank(TemplateView):
 
 def blog_list(request):
     posts = BlogPost.objects.filter(is_published=True)
-    paginator = Paginator(posts, 5)
+    paginator = Paginator(posts, 6)
     page_obj = paginator.get_page(request.GET.get('page'))
     return render(request, 'home/blog.html', {
         'page_obj': page_obj,
         'blog_posts': page_obj.object_list,
-        'blog_categories': posts.values_list('category', flat=True).distinct()[:6],
+        'blog_categories': Category.objects.all(),
     })
 
 

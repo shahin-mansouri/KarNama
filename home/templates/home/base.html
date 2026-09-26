@@ -7,14 +7,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}خانه | کارنما{% endblock %}</title>
   <meta name="description" content="{% block meta_description %}در کارنما رزومه حرفه‌ای آنلاین بسازید، مهارت‌ها و تجربه‌های کاری خود را معرفی کنید و برای فرصت‌های شغلی بهتر آماده شوید.{% endblock %}" />
-  <link rel="canonical" href="https://karnamma.ir{{ request.path }}" />
+  <link rel="canonical" href="{% block canonical_url %}https://karnamma.ir{{ request.path }}{% endblock %}" />
   <meta property="og:locale" content="fa_IR" />
+  <meta property="og:site_name" content="کارنما" />
   <meta property="og:title" content="{% block og_title %}کارنما{% endblock %}" />
   <meta property="og:description" content="{% block og_description %}رزومه حرفه‌ای خود را بسازید و مسیر شغلی‌تان را بهتر ارائه کنید.{% endblock %}" />
-  <meta property="og:image" content="https://karnamma.ir{% static 'home/image/logo.ico' %}" />
-  <meta property="og:url" content="https://karnamma.ir{{ request.path }}" />
-  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://karnamma.ir{% static 'home/image/logo.png' %}" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:alt" content="کارنما" />
+  <meta property="og:url" content="{% block og_url %}https://karnamma.ir{{ request.path }}{% endblock %}" />
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{% block twitter_title %}کارنما{% endblock %}" />
+  <meta name="twitter:description" content="{% block twitter_description %}رزومه حرفه‌ای خود را بسازید و مسیر شغلی‌تان را بهتر ارائه کنید.{% endblock %}" />
+  <meta name="twitter:image" content="https://karnamma.ir{% static 'home/image/logo.png' %}" />
   <meta name="theme-color" content="#07110f" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

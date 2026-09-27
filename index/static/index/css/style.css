@@ -766,7 +766,8 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     }
 
     body {
-        padding: 12mm 14mm 14mm;
+        /* page margins: generous top/bottom so content never touches the paper edge */
+        padding: 18mm 16mm 20mm;
         margin: 0;
         height: auto;
         min-height: 0;
@@ -785,12 +786,19 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     }
 
     .print-only { display: block; }
+
+    .profile-details {
+        gap: 1.5mm 6mm;
+        margin: 2.5mm 0 0;
+        font-size: 9pt;
+    }
+
     .print-contact.print-only {
         display: flex;
         flex-wrap: wrap;
         gap: 0 10px;
         list-style: none;
-        margin-top: 10px;
+        margin-top: 3mm;
         padding: 0;
         color: var(--text2);
         font-size: 9pt;
@@ -811,6 +819,7 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     .scroll-progress,
     .back-top,
     .hero-btns,
+    .print-resume-btn,
     .hero-social,
     .filter-btns,
     .testimonials-section,
@@ -836,22 +845,26 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     }
 
     section {
-        padding: 7mm 0 0;
+        /* consistent vertical rhythm between sections when printed */
+        padding: 0;
+        margin: 0 0 9mm;
         scroll-margin-top: 0;
         break-inside: auto;
         page-break-inside: auto;
     }
+    section:last-of-type { margin-bottom: 0; }
 
     .section-title {
         font-size: 13pt;
         font-weight: 700;
         letter-spacing: 0;
-        margin: 0 0 4mm;
+        margin: 0 0 5.5mm;
+        padding-top: 2mm;
         break-after: avoid;
         page-break-after: avoid;
     }
     .section-title::after {
-        bottom: -2mm;
+        bottom: -2.2mm;
         width: 22px;
         height: 2.5px;
         background: var(--primary);
@@ -860,7 +873,8 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     .hero {
         min-height: 0;
         display: block;
-        padding: 0 0 5mm;
+        padding: 2mm 0 6mm;
+        margin-bottom: 9mm;
         border-bottom: 1px solid var(--border);
         break-inside: avoid;
         page-break-inside: avoid;
@@ -911,11 +925,11 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     .stats {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 3mm;
-        margin-top: 5mm;
+        gap: 3.5mm;
+        margin-top: 6.5mm;
     }
     .stat-item {
-        padding: 2.5mm 1mm;
+        padding: 3mm 1mm;
         border-radius: 6px;
         border: 1px solid var(--border);
         background: var(--surface2);
@@ -942,7 +956,7 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
 
     #about .card {
         max-width: none !important;
-        padding: 4mm 4.5mm;
+        padding: 5mm 5.5mm;
         border-radius: 6px;
         border: 1px solid var(--border);
         background: var(--surface);
@@ -956,10 +970,10 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     .skills-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 2.5mm 3.5mm;
+        gap: 3.5mm 4.5mm;
     }
     .skill-item {
-        padding: 2.5mm 3mm;
+        padding: 3mm 3.5mm;
         border-radius: 6px;
         border: 1px solid var(--border);
         background: var(--surface);
@@ -968,7 +982,7 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     }
     .skill-item .name {
         font-size: 9pt;
-        margin-bottom: 1.5mm;
+        margin-bottom: 2mm;
     }
     .skill-bar {
         height: 3px;
@@ -989,7 +1003,8 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
         background: var(--border);
     }
     .timeline-item {
-        margin-bottom: 4.5mm;
+        /* uniform spacing between items (overrides the 40px screen margin) */
+        margin: 0 0 5.5mm;
         padding-inline-start: 6mm;
         break-inside: avoid;
         page-break-inside: avoid;
@@ -1027,7 +1042,7 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     }
     .tech-tags {
         gap: 1.5mm;
-        margin-top: 2mm;
+        margin-top: 2.5mm;
     }
     .tech-tags span {
         padding: 0.4mm 2.2mm;
@@ -1040,10 +1055,10 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     .projects-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 4mm;
+        gap: 5mm 5.5mm;
     }
     .project-card {
-        padding: 3.5mm;
+        padding: 4mm;
         border-radius: 6px;
         border: 1px solid var(--border);
         background: var(--surface);
@@ -1102,10 +1117,10 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     .certificates-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 3mm;
+        gap: 4mm 4.5mm;
     }
     .certificate-card {
-        padding: 3.5mm 4mm;
+        padding: 4mm 4.5mm;
         border-radius: 6px;
         border: 1px solid var(--border);
         background: var(--surface);
@@ -1148,19 +1163,19 @@ body.fa .nav-links a.active::after { inset-inline-start: 20%; }
     .contact-social-links {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1.5mm;
+        gap: 2.5mm;
     }
     .languages-grid,
     .researches-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 3mm;
+        gap: 4mm 4.5mm;
     }
     .language-item,
     .research-card {
         width: auto;
         height: auto;
-        padding: 3.5mm 4mm;
+        padding: 4mm 4.5mm;
         border-radius: 6px;
         border: 1px solid var(--border);
         background: var(--surface);

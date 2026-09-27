@@ -82,9 +82,21 @@ Create a `.env` file in the project root:
 SECRET_KEY=your-secret-key
 DEBUG=True
 ALLOWED_HOSTS=127.0.0.1,localhost
+DASHSCOPE_API_KEY=your-dashscope-api-key
+# Optional: DASHSCOPE_MODEL=qwen-plus
 ```
 
 Keep the `.env` file private and do not commit production secrets.
+
+### Automatic Blog Publishing
+
+Generate and publish one career-focused article from the project root:
+
+```bash
+python home/blog_generator.py
+```
+
+The generator accepts `--count` from 1 to 10, validates the model response, restricts categories to career and hiring topics, and saves approved posts as published. Run this command from Windows Task Scheduler or cron for automatic publishing.
 
 ### 5. Apply migrations
 

@@ -39,6 +39,45 @@ class ContactMessageTests(TestCase):
 		self.assertEqual(response.status_code, 400)
 		self.assertFalse(response.json()['success'])
 		self.assertEqual(ContactMessage.objects.count(), 0)
+
+	def test_recipient_can_list_and_open_messages(self):
+		contact_message = ContactMessage.objects.create(
+			recipient=self.recipient,
+			name='Visitor',
+			email='visitor@example.com',
+			subject='A new opportunity',
+			message='Please contact me.',
+		)
+		self.client.force_login(self.recipient)
+
+		list_response = self.client.get(reverse('message_list'))
+		self.assertContains(list_response, 'A new opportunity')
+		self.assertContains(list_response, 'is-unread')
+
+		detail_response = self.client.get(reverse('message_detail', args=[contact_message.pk]))
+		self.assertEqual(detail_response.status_code, 200)
+		self.assertContains(detail_response, 'Please contact me.')
+		self.assertTrue(ContactMessage.objects.get(pk=contact_message.pk).is_read)
+
+	def test_other_user_cannot_open_message(self):
+		other_user = UserCustom.objects.create_user(
+			username='other',
+			email='other@example.com',
+			phone_number='09123456780',
+			password='test-password',
+		)
+		contact_message = ContactMessage.objects.create(
+			recipient=self.recipient,
+			name='Visitor',
+			email='visitor@example.com',
+			subject='Private message',
+			message='Private content.',
+		)
+		self.client.force_login(other_user)
+
+		response = self.client.get(reverse('message_detail', args=[contact_message.pk]))
+		self.assertEqual(response.status_code, 404)
+		self.assertFalse(ContactMessage.objects.get(pk=contact_message.pk).is_read)
 from django.test import TestCase
 
 from account.models import UserCustom

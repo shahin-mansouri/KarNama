@@ -1,10 +1,10 @@
 {% extends 'home/base.html' %}
 {% load static %}
 
-{% block title %}کارنما | رزومه‌ای برای قدم بعدی شما{% endblock %}
-{% block meta_description %}با کارنما یک رزومه حرفه‌ای آنلاین بسازید، تجربه‌ها و مهارت‌های خود را بهتر ارائه کنید و برای پیدا کردن فرصت شغلی مناسب آماده شوید.{% endblock %}
-{% block og_title %}کارنما | رزومه‌ای برای قدم بعدی شما{% endblock %}
-{% block og_description %}رزومه حرفه‌ای خود را بسازید، تجربه‌های شغلی‌تان را بهتر ارائه کنید و مسیر شغلی‌تان را توسعه دهید.{% endblock %}
+{% block title %}کارنما | رزومه آنلاین، بانک رزومه و مسیر شغلی شما{% endblock %}
+{% block meta_description %}با کارنما رزومه آنلاین حرفه‌ای بسازید، در بانک رزومه دیده شوید، از کارفرمایان پیام بگیرید و با راهنماهای رزومه و مصاحبه، قدم بعدی شغلی‌تان را آماده کنید. رایگان و بدون نیاز به دانش فنی.{% endblock %}
+{% block og_title %}کارنما | رزومه آنلاین، بانک رزومه و مسیر شغلی شما{% endblock %}
+{% block og_description %}رزومه بسازید، در بانک رزومه دیده شوید، پیام کاری بگیرید و از مطالب مسیر شغلی استفاده کنید.{% endblock %}
 
 {% block content %}
 <main>
@@ -12,18 +12,23 @@
     <div class="hero-glow" aria-hidden="true"></div>
     <div class="home-container hero-layout">
       <div class="hero-copy">
-        <span class="eyebrow">پلتفرم رزومه آنلاین</span>
+        <span class="eyebrow">پلتفرم رزومه آنلاین و بانک استخدامی</span>
         <h1>رزومه‌ای بسازید که <em id="heroTypedText">داستان شما</em> را درست روایت کند.</h1>
-        <p>اطلاعات حرفه‌ای‌تان را یک‌جا مدیریت کنید، رزومه‌ای مرتب بسازید و از مطالب کاربردی برای قدم بعدی مسیر شغلی‌تان استفاده کنید.</p>
+        <p>در کارنما یک‌بار اطلاعات حرفه‌ای خود را وارد کنید و از آنجا به بعد همه‌چیز خودش می‌چرخد: صفحه رزومه آنلاین با لینک اختصاصی، حضور در بانک رزومه جلوی چشم کارفرمایان، صندوق پیام برای دریافت پیشنهاد کاری و وبلاگی که نوشتن و مصاحبه شدن را یاد می‌دهد.</p>
         <div class="hero-actions">
-          <a class="button button-accent" href="{% url 'login' %}">ساخت رزومه رایگان <span>←</span></a>
-          <a class="outline-link" href="#blog">مطالب مسیر شغلی <span>↗</span></a>
+          {% if user.is_authenticated %}
+            <a class="button button-accent" href="{% url 'dashboard' %}">ادامه ساخت رزومه <span>←</span></a>
+            <a class="outline-link" href="{% url 'profile' user.username %}">رزومه من <span>↗</span></a>
+          {% else %}
+            <a class="button button-accent" href="{% url 'login' %}">ساخت رزومه رایگان <span>←</span></a>
+            <a class="outline-link" href="#blog">مطالب مسیر شغلی <span>↗</span></a>
+          {% endif %}
         </div>
-        <div class="hero-note"><span class="note-dot"></span>کاملا رایگان!</div>
+        <div class="hero-note"><span class="note-dot"></span>ورود با شماره موبایل و کد پیامکی — بدون ایمیل و رمز عبور، کاملا رایگان!</div>
         <ul class="hero-stats" aria-label="نکات کلیدی">
-          <li><strong>۳ دقیقه</strong><span>تا اولین نسخه رزومه</span></li>
-          <li><strong>آنلاین</strong><span>قابل اشتراک با یک لینک</span></li>
-          <li><strong>به‌روز</strong><span>ویرایش هر زمان که بخواهید</span></li>
+          <li><strong>۳ دقیقه</strong><span>ثبت‌نام با کد پیامکی و ورود به ویزارد</span></li>
+          <li><strong>یک لینک</strong><span>رزومه آنلاین، قابل اشتراک همه‌جا</span></li>
+          <li><strong>بانک رزومه</strong><span>دیده‌شدن توسط کارفرمایان</span></li>
         </ul>
         <form class="resume-search resume-search-home" method="get" action="{% url 'resume_bank' %}">
           <label for="home-resume-search">دنبال چه تخصصی هستید؟</label>
@@ -31,12 +36,12 @@
             <input id="home-resume-search" name="q" type="search" placeholder="مثلاً برنامه‌نویس پایتون یا طراح محصول" value="{{ request.GET.q|default:'' }}">
             <button class="button button-dark" type="submit">جست‌وجوی رزومه</button>
           </div>
-          <small>در میان مهارت‌ها، تجربه‌ها و پروژه‌های افراد جست‌وجو کنید.</small>
+          <small>جست‌وجو در نام، عنوان شغلی، مهارت‌ها، تجربیات، پروژه‌ها، گواهینامه‌ها و زبان‌های {{ stat_profiles }} پروفایل منتشرشده.</small>
         </form>
       </div>
       <div class="hero-board hero-border" aria-label="پیش‌نمایش رزومه">
         <span class="hero-border-comet" aria-hidden="true"></span>
-        <div class="board-top"><span>پیش‌نمایش رزومه</span><i>•••</i></div>
+        <div class="board-top"><span>cv.karnamma.ir/shahin</span><i>•••</i></div>
         <div class="board-profile"><div class="profile-mark">ش</div><div><strong>شاهین منصوری</strong><small>توسعه‌دهنده نرم‌افزار</small></div></div>
         <div class="board-line wide"></div><div class="board-line"></div>
         <div class="board-pills"><span>Python</span><span>Django</span><span>Product</span></div>
@@ -46,11 +51,22 @@
     </div>
   </section>
 
+  <section class="trust-strip" aria-label="آمار کارنما">
+    <div class="home-container trust-inner">
+      <div class="trust-item"><strong>{{ stat_profiles }}</strong><span>پروفایل حرفه‌ای منتشرشده</span></div>
+      <div class="trust-item"><strong>{{ stat_projects }}</strong><span>پروژه ثبت‌شده با لینک گیت‌هاب و دموی زنده</span></div>
+      <div class="trust-item"><strong>{{ stat_skills }}</strong><span>مهارت با درصد تسلط روی رزومه‌ها</span></div>
+      <div class="trust-item"><strong>{{ stat_posts }}</strong><span>راهنمای کاربردی در وبلاگ</span></div>
+      <div class="trust-item"><strong>رایگان</strong><span>ساخت، ویرایش و انتشار رزومه</span></div>
+    </div>
+  </section>
+
   <section class="feature-section" id="successful-people">
     <div class="home-container">
       <div class="section-heading">
         <span>افراد موفق</span>
         <h2>مسیرهای حرفه‌ای الهام‌بخش</h2>
+        <p>قبل از شروع، نگاهی به رزومه اعضای کارنما بیندازید؛ نحوه نوشتن عنوان شغلی، معرفی کوتاه و چیدن مهارت‌ها بهترین الگو برای رزومه خودتان است.</p>
       </div>
       <div class="resume-grid">
         {% for successful_person in successful_people %}
@@ -76,33 +92,52 @@
             <a class="resume-card-link" href="{% url 'profile' successful_person.username %}">مشاهده رزومه <span>←</span></a>
           </article>
         {% empty %}
-          <p>هنوز پروفایل عمومی برای نمایش ثبت نشده است.</p>
+          <p>هنوز پروفایل عمومی برای نمایش ثبت نشده است. اولین نفر باشید که رزومه‌اش را در کارنما منتشر می‌کند.</p>
         {% endfor %}
+      </div>
+      <div class="section-more">
+        <a class="outline-link" href="{% url 'resume_bank' %}">مرور همه رزومه‌ها در بانک رزومه <span>↗</span></a>
       </div>
     </div>
   </section>
 
-  <section class="feature-section" id="features">
+  <section class="feature-section features-alt" id="features">
     <div class="home-container">
       <div class="section-heading">
-        <span>همه‌چیز در یک نگاه</span>
-        <h2>ابزارهای ساده برای ارائه بهتر شما</h2>
+        <span>قابلیت‌های کارنما</span>
+        <h2>فقط رزومه نیست؛ یک سامانه کامل برای دیده‌شدن</h2>
+        <p>هر چیزی که برای ساختن، به‌روز نگه‌داشتن و فرستادن رزومه لازم دارید در یک حساب کاربری جمع شده است.</p>
       </div>
-      <div class="feature-grid">
+      <div class="feature-grid feature-grid-wide">
         <article>
-          <b>01</b>
-          <h3>پروفایل حرفه‌ای</h3>
-          <p>اطلاعات کاری، مهارت‌ها و پروژه‌های خود را در یک صفحه قابل اشتراک نگه دارید.</p>
+          <b>۰۱</b>
+          <h3>رزومه آنلاین با لینک اختصاصی</h3>
+          <p>صفحه رزومه شما روی یک آدرس ساده مثل <code>karnamma.ir/username</code> منتشر می‌شود؛ همین لینک را در اینستاگرام، تلگرام، واتساپ و امضای ایمیل بگذارید تا همیشه آخرین نسخه را نشان دهید.</p>
         </article>
         <article>
-          <b>02</b>
-          <h3>ویرایش سریع</h3>
-          <p>هر زمان شغل یا مهارت جدیدی اضافه شد، رزومه‌تان را بدون شروع دوباره به‌روز کنید.</p>
+          <b>۰۲</b>
+          <h3>بانک رزومه و جست‌وجوی هوشمند</h3>
+          <p>رزومه شما در بانک رزومه قرار می‌گیرد و کارفرما می‌تواند با یک کلمه کلیدی پیدایتان کند. جست‌وجو روی نام، عنوان شغلی، مهارت، شرکت، پروژه، فناوری، گواهینامه و حتی زبان‌های شما نتیجه می‌دهد.</p>
         </article>
         <article>
-          <b>03</b>
-          <h3>خروجی آماده ارسال</h3>
-          <p>رزومه شما با ساختاری خوانا و مناسب برای ارسال به کارفرما آماده می‌شود.</p>
+          <b>۰۳</b>
+          <h3>صندوق پیام و دریافت پیشنهاد کاری</h3>
+          <p>هر کسی از روی رزومه شما می‌تواند مستقیم پیام بفرستد. پیام‌ها در پنل کاربری با نشان خوانده‌نشده جمع می‌شوند تا هیچ فرصت شغلی را از دست ندهید.</p>
+        </article>
+        <article>
+          <b>۰۴</b>
+          <h3>نظرات همکاران (توصیف‌نامه)</h3>
+          <p>همکاران و مدیران قبلی می‌توانند زیر رزومه شما نظر حرفه‌ای بگذارند. چند جمله تأییدشده از کسی که با شما کار کرده، از ده خط توضیح درباره خودتان ارزشمندتر است.</p>
+        </article>
+        <article>
+          <b>۰۵</b>
+          <h3>مدیریت کامل بخش‌های رزومه</h3>
+          <p>مهارت با درصد تسلط، سابقه کار با فناوری‌های هر دوره، پروژه با لینک گیت‌هاب و دموی زنده، گواهینامه، تحقیقات، زبان‌ها و شبکه‌های اجتماعی؛ همه‌چیز جداگانه قابل افزودن، ویرایش و حذف است.</p>
+        </article>
+        <article>
+          <b>۰۶</b>
+          <h3>وبلاگ مسیر شغلی</h3>
+          <p>راهنمای نوشتن رزومه، آمادگی برای مصاحبه، کاریابی، استخدام، مهارت‌های شغلی و برند شخصی. قبل از ارسال رزومه برای یک موقعیت، مطلب مرتبط را در بلاگ بخوانید.</p>
         </article>
       </div>
     </div>
@@ -112,25 +147,100 @@
     <div class="home-container">
       <div class="section-heading">
         <span>مسیر کوتاه‌تر</span>
-        <h2>از اطلاعات خام تا رزومه آماده</h2>
+        <h2>در چهار قدم از شماره موبایل تا رزومه منتشرشده</h2>
+        <p>وارد کردن اطلاعات از صفر سخت‌ترین مرحله است؛ ویزارد مرحله‌به‌مرحله کارنما همین مشکل را حل می‌کند.</p>
       </div>
-      <div class="steps-grid">
+      <div class="steps-grid steps-grid-four">
         <div>
           <strong>۱</strong>
-          <h3>ثبت‌نام کنید</h3>
-          <p>حساب خود را در چند ثانیه بسازید.</p>
+          <h3>با کد پیامکی وارد شوید</h3>
+          <p>شماره موبایل خود را وارد کنید و کد شش‌رقمی را وارد نمایید. بدون ایمیل، بدون رمز عبور؛ حدود یک دقیقه.</p>
         </div>
         <div>
           <strong>۲</strong>
-          <h3>اطلاعات را وارد کنید</h3>
-          <p>تجربه و توانایی‌هایتان را کامل کنید.</p>
+          <h3>ویزارد تکمیل اطلاعات</h3>
+          <p>ده مرحله کوتاه: مشخصات فردی، عنوان شغلی و بیو، درباره من، مهارت‌ها، سابقه کار، پروژه‌ها، گواهینامه‌ها، زبان‌ها، تحقیقات و شبکه‌های اجتماعی.</p>
         </div>
         <div>
           <strong>۳</strong>
           <h3>رزومه را منتشر کنید</h3>
-          <p>صفحه حرفه‌ای خود را با دیگران به اشتراک بگذارید.</p>
+          <p>صفحه حرفه‌ای شما ساخته و به‌صورت خودکار در بانک رزومه و نتایج جست‌وجو قرار می‌گیرد؛ لینکش را همه‌جا بفرستید.</p>
+        </div>
+        <div>
+          <strong>۴</strong>
+          <h3>فرصت‌ها را مدیریت کنید</h3>
+          <p>پیام‌های کاری را در پنل ببینید، نظرات همکاران را دریافت کنید و هر زمان مهارت یا شغل تازه‌ای آمد، رزومه را در داشبورد به‌روز کنید.</p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="feature-section" id="resume-builder">
+    <div class="home-container builder-layout">
+      <div class="builder-copy">
+        <span class="section-kicker">ساختار رزومه</span>
+        <h2>هر چیزی که یک رزومه کامل نیاز دارد، به‌صورت استاندارد</h2>
+        <p>جای نگرانی درباره قالب و فایل Word نیست. بخش‌های رزومه شما از همان اول حرفه‌ای طراحی شده‌اند و کافی است محتوا را اضافه کنید.</p>
+        <a class="button button-accent" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}">همین حالا بخش‌ها را پر کنید <span>←</span></a>
+      </div>
+      <div class="builder-list">
+        <div class="builder-item"><b>معرفی و عنوان شغلی</b><span>عنوان دقیق، عکس پروفایل و متنی که در سه ثانیه می‌گوید چه کسی هستید.</span></div>
+        <div class="builder-item"><b>تجربه کاری + فناوری‌ها</b><span>برای هر سمت، شرکت، بازه زمانی و ابزارهایی که در آن دوره استفاده کرده‌اید.</span></div>
+        <div class="builder-item"><b>پروژه‌ها با لینک واقعی</b><span>نمونه کار با لینک گیت‌هاب، دموی زنده و حوزه فعالیت؛ مدرک عملی مهارت شما.</span></div>
+        <div class="builder-item"><b>مهارت و زبان با درصد تسلط</b><span>سطح هر مهارت و زبان را عددی نشان دهید تا کارفرما سریع‌تر قضاوت کند.</span></div>
+        <div class="builder-item"><b>گواهینامه و تحقیقات</b><span>دوره‌ها، مدارک معتبر با لینک استعلام و فعالیت‌های پژوهشی‌تان را ثبت کنید.</span></div>
+        <div class="builder-item"><b>شبکه‌های اجتماعی حرفه‌ای</b><span>گیت‌هاب، لینکدین، تلگرام، اینستاگرام، یوتیوب و وب‌سایت شخصی در یک بلوک تماس.</span></div>
+      </div>
+    </div>
+  </section>
+
+  {% if featured_testimonials %}
+  <section class="feature-section testimonial-section" id="testimonials">
+    <div class="home-container">
+      <div class="section-heading">
+        <span>نظرات همکاران</span>
+        <h2>آنچه افراد پشت رزومه‌ها می‌گویند</h2>
+        <p>توصیف‌نامه‌های ثبت‌شده در کارنما، اعتبار واقعی هر رزومه را می‌سازند.</p>
+      </div>
+      <div class="testimonial-grid">
+        {% for testimonial in featured_testimonials %}
+          <figure class="testimonial-card">
+            <blockquote>{{ testimonial.text|truncatechars:260 }}</blockquote>
+            <figcaption>
+              <strong>{{ testimonial.author.get_full_name|default:testimonial.author.username }}</strong>
+              <span>{% if testimonial.role %}{{ testimonial.role }} · {% endif %}درباره <a href="{% url 'profile' testimonial.recipient.username %}">{{ testimonial.recipient.get_full_name|default:testimonial.recipient.username }}</a></span>
+            </figcaption>
+          </figure>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="feature-section audience-split" id="audiences">
+    <div class="home-container audience-grid">
+      <article class="audience-card">
+        <span class="audience-tag">برای متخصصان و کارجویان</span>
+        <h3>یک‌بار بسازید، همه‌جا بفرستید</h3>
+        <ul>
+          <li>رزومه همیشه آنلاین و به‌روز؛ خداحافظی با نسخه‌های متعدد PDF.</li>
+          <li>حضور در بانک رزومه و افزایش شانس دیده‌شدن توسط کارفرما.</li>
+          <li>دریافت پیام و پیشنهاد کاری مستقیم، بدون واسطه.</li>
+          <li>نمایش نمونه‌کارها با لینک زنده به‌جای ادعا کردن.</li>
+        </ul>
+        <a class="resume-card-link" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}">ساخت رزومه من <span>←</span></a>
+      </article>
+      <article class="audience-card">
+        <span class="audience-tag audience-tag-alt">برای کارفرمایان و تیم‌های استخدام</span>
+        <h3>نیروی مناسب را خودتان پیدا کنید</h3>
+        <ul>
+          <li>جست‌وجوی تخصصی بر اساس مهارت، فناوری، شرکت و پروژه.</li>
+          <li>مرور سریع توانایی‌ها، سوابق و نمونه‌کارها در یک صفحه.</li>
+          <li>ارتباط مستقیم با صاحب رزومه از طریق فرم پیام.</li>
+          <li>دسترسی به نتایج مرتب‌شده بر اساس نزدیک‌ترین ارتباط.</li>
+        </ul>
+        <a class="resume-card-link" href="{% url 'resume_bank' %}">ورود به بانک رزومه <span>←</span></a>
+      </article>
     </div>
   </section>
 
@@ -140,50 +250,89 @@
         <div class="section-heading">
           <span>Blog / یادداشت‌های مسیر</span>
           <h2>هر روز چیزی برای بهتر شدن</h2>
-          <p>راهنماهای کوتاه و کاربردی درباره رزومه، مصاحبه و رشد شغلی.</p>
+          <p>راهنماهای کوتاه و کاربردی درباره رزومه، مصاحبه و رشد شغلی؛ نوشته‌شده برای کسانی که دنبال قدم بعدی‌اند.</p>
         </div>
         <a class="outline-link" href="{% url 'blog_list' %}">همه مطالب <span>↗</span></a>
       </div>
       <div class="category-row">
         {% for category in blog_categories %}
-          <span>{{ category }}</span>
+          <a href="{% url 'blog_list' %}?category={{ category.pk }}">{{ category.name }}{% if category.post_count %} ({{ category.post_count }}){% endif %}</a>
         {% empty %}
-          <span>رزومه</span>
-          <span>مصاحبه شغلی</span>
-          <span>رشد حرفه‌ای</span>
+          <a href="{% url 'blog_list' %}">رزومه</a>
+          <a href="{% url 'blog_list' %}">مصاحبه شغلی</a>
+          <a href="{% url 'blog_list' %}">رشد حرفه‌ای</a>
         {% endfor %}
       </div>
       <div class="post-grid">
         {% for post in latest_posts %}
           <article class="post-card">
-            <div class="post-meta"><span>{{ post.category }}</span><time>{{ post.published_at|date:'j F Y' }}</time></div>
+            <div class="post-meta"><span>{{ post.category.name }}</span><time>{{ post.published_at|date:'j F Y' }}</time></div>
             <h3>{{ post.title }}</h3>
             <p>{{ post.excerpt }}</p>
             <a href="{% url 'blog_detail' post.slug %}">ادامه مطلب <span>←</span></a>
           </article>
         {% empty %}
           <article class="post-card post-empty">
-            <span class="post-number">تازه</span>
-            <h3>چطور رزومه‌ای بنویسیم که خوانده شود؟</h3>
-            <p>به‌زودی اولین یادداشت‌های کاربردی درباره ساخت رزومه و مسیر شغلی منتشر می‌شوند.</p>
+            <span class="post-number">به‌زودی</span>
+            <h3>چطور رزومه‌ای بنویسیم که واقعا خوانده شود؟</h3>
+            <p>اولین راهنماها درباره ساخت رزومه، انتخاب عنوان شغلی و اشتباهات رایج مصاحبه منتشر می‌شوند. عضو شوید تا باخبر بمانید.</p>
             <a href="{% url 'login' %}">عضو شوید تا باخبر بمانید <span>←</span></a>
           </article>
           <article class="post-card post-empty">
             <span class="post-number">۰۲</span>
-            <h3>مهارت‌ها را چطور به تجربه تبدیل کنیم؟</h3>
-            <p>موضوعات متنوعی برای یادگیری و پیشرفت روزانه در Blog منتشر خواهد شد.</p>
-            <a href="#blog">دنبال کردن Blog <span>←</span></a>
+            <h3>مهارت‌ها را چطور به تجربه قابل اثبات تبدیل کنیم؟</h3>
+            <p>دسته‌بندی‌های وبلاگ شامل کاریابی، استخدام، ساخت رزومه، رزومه موفق، مصاحبه شغلی، مهارت‌های شغلی و برند شخصی است.</p>
+            <a href="{% url 'blog_list' %}">دنبال کردن Blog <span>←</span></a>
           </article>
         {% endfor %}
       </div>
     </div>
   </section>
 
+  <section class="faq-section" id="faq">
+    <div class="home-container faq-layout">
+      <div class="faq-intro">
+        <span class="section-kicker">سوال‌های رایج</span>
+        <h2>هرچه لازم است قبل از شروع بدانید</h2>
+        <p>جواب کوتاه به سوال‌هایی که بیشتر از همه درباره کارنما می‌پرسید.</p>
+      </div>
+      <details class="faq-item" open>
+        <summary>استفاده از کارنما هزینه دارد؟</summary>
+        <p>خیر. ساخت رزومه، انتشار آن در بانک رزومه، دریافت پیام و ویرایش نامحدود رایگان است.</p>
+      </details>
+      <details class="faq-item">
+        <summary>بدون ایمیل و رمز عبور چطور وارد شوم؟</summary>
+        <p>با شماره موبایل و کد یکبارمصرف پیامکی وارد می‌شوید؛ نیازی به حفظ رمز عبور نیست و بازیابی حساب هم معنایی ندارد.</p>
+      </details>
+      <details class="faq-item">
+        <summary>اطلاعات من کجاها نمایش داده می‌شود؟</summary>
+        <p>فقط بخش‌هایی که خودتان تکمیل کرده‌اید در صفحه رزومه عمومی و بانک رزومه دیده می‌شود. شماره موبایل و ایمیل شما عمومی نمی‌شود و راه ارتباطی همان فرم پیام است.</p>
+      </details>
+      <details class="faq-item">
+        <summary>رزومه‌ام را چطور به‌روز نگه دارم؟</summary>
+        <p>از داشبورد، هر بخش را جداگانه ویرایش یا حذف کنید. تغییرات بلافاصله روی همان لینک قبلی اعمال می‌شود و لازم نیست لینک تازه‌ای بفرستید.</p>
+      </details>
+      <details class="faq-item">
+        <summary>کارفرما چطور من را پیدا می‌کند؟</summary>
+        <p>با جست‌وجوی کلمه کلیدی در بانک رزومه (مثلاً «Django» یا «طراحی محصول») رزومه‌های مرتبط بر اساس نزدیک‌ترین ارتباط مرتب می‌شوند و صاحب رزومه می‌تواند مستقیم پیام بگیرد.</p>
+      </details>
+    </div>
+  </section>
+
   <section class="home-cta">
     <div class="home-container">
       <span>قدم بعدی شما از همین‌جا شروع می‌شود.</span>
-      <h2>رزومه‌تان را امروز بسازید.</h2>
-      <a class="button button-accent" href="{% url 'login' %}">شروع رایگان <span>←</span></a>
+      <h2>امروز رزومه‌تان را بسازید، فردا کارفرما پیدایتان می‌کند.</h2>
+      <p>در کمتر از ده دقیقه، یک صفحه حرفه‌ای با لینک اختصاصی داشته باشید و در بانک رزومه حاضر شوید.</p>
+      <div class="hero-actions">
+        {% if user.is_authenticated %}
+          <a class="button button-accent" href="{% url 'dashboard' %}">رفتن به داشبورد <span>←</span></a>
+          <a class="outline-link outline-link-light" href="{% url 'profile' user.username %}">مشاهده رزومه من <span>↗</span></a>
+        {% else %}
+          <a class="button button-accent" href="{% url 'login' %}">شروع رایگان <span>←</span></a>
+          <a class="outline-link outline-link-light" href="{% url 'about' %}">چرا کارنما؟ <span>↗</span></a>
+        {% endif %}
+      </div>
     </div>
   </section>
 </main>

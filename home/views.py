@@ -1,12 +1,19 @@
+from django.contrib.humanize.templatetags.humanize import intcomma
 from django.core.paginator import Paginator
+from django.db.models import Case, Count, IntegerField, Q, Value, When
 from django.http import HttpResponse
-from django.db.models import Case, IntegerField, Q, Value, When
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView
 
-from account.models import UserCustom
+from account.models import Project, Skill, UserCustom, WorkExperience
+from message.models import ContactMessage, Testimonial
 
 from .models import BlogPost, Category
+
+
+def _persian_digits(value):
+    table = str.maketrans('0123456789', '۰۱۲۳۴۵۶۷۸۹')
+    return str(value).translate(table)
 
 
 class Home(TemplateView):
@@ -14,9 +21,41 @@ class Home(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['latest_posts'] = BlogPost.objects.filter(is_published=True)[:3]
-        context['blog_categories'] = Category.objects.all()
+        context['latest_posts'] = BlogPost.objects.filter(
+            is_published=True,
+        ).select_related('category')[:3]
+        context['blog_categories'] = Category.objects.annotate(
+            post_count=Count(
+                'blogpost', filter=Q(blogpost__is_published=True)
+            )
+        ).order_by('-post_count', 'id')
         context['successful_people'] = _resume_queryset()[:3]
+        context['featured_testimonials'] = (
+            Testimonial.objects
+            .filter(is_approved=True)
+            .select_related('author', 'recipient', 'recipient__userprofile')[:6]
+        )
+
+        profile_count = (
+            UserCustom.objects
+            .filter(is_active=True, userprofile__isnull=False)
+            .count()
+        )
+        published_posts = BlogPost.objects.filter(is_published=True).count()
+        skill_total = Skill.objects.count()
+        project_total = Project.objects.count()
+        experience_total = WorkExperience.objects.count()
+        message_total = ContactMessage.objects.count()
+
+        context['stat_profiles'] = _persian_digits(intcomma(profile_count))
+        context['stat_projects'] = _persian_digits(intcomma(project_total))
+        context['stat_skills'] = _persian_digits(intcomma(skill_total))
+        context['stat_experiences'] = _persian_digits(intcomma(experience_total))
+        context['stat_posts'] = _persian_digits(intcomma(published_posts))
+        context['stat_messages'] = _persian_digits(intcomma(message_total))
+        context['skill_average'] = _persian_digits(
+            round(skill_total / profile_count) if profile_count else 0
+        )
         return context
 
 
@@ -36,25 +75,53 @@ class ResumeBank(TemplateView):
 
         context['page_obj'] = page_obj
         context['resume_users'] = page_obj.object_list
-        context['resume_count'] = paginator.count
+        context['resume_count'] = _persian_digits(intcomma(paginator.count))
         context['search_query'] = query
         return context
 
 
 def blog_list(request):
-    posts = BlogPost.objects.filter(is_published=True)
+    posts = BlogPost.objects.filter(is_published=True).select_related('category')
     paginator = Paginator(posts, 6)
     page_obj = paginator.get_page(request.GET.get('page'))
+    category_id = request.GET.get('category', '').strip()
+    active_category = None
+
+    if category_id.isdigit():
+        active_category = Category.objects.filter(pk=category_id).first()
+
+    categories = Category.objects.annotate(
+        post_count=Count('blogpost', filter=Q(blogpost__is_published=True))
+    ).order_by('-post_count', 'id')
+
+    base_query = ''
+    if category_id:
+        base_query = f'category={category_id}&'
+
     return render(request, 'home/blog.html', {
         'page_obj': page_obj,
         'blog_posts': page_obj.object_list,
-        'blog_categories': Category.objects.all(),
+        'blog_categories': categories,
+        'active_category': active_category,
+        'base_query': base_query,
     })
 
 
 def blog_detail(request, slug):
-    post = get_object_or_404(BlogPost, slug=slug, is_published=True)
-    return render(request, 'home/blog_detail.html', {'post': post})
+    post = get_object_or_404(
+        BlogPost.objects.select_related('category'),
+        slug=slug,
+        is_published=True,
+    )
+    related_posts = (
+        BlogPost.objects
+        .filter(is_published=True, category=post.category)
+        .exclude(pk=post.pk)[:3]
+    )
+    return render(request, 'home/blog_detail.html', {
+        'post': post,
+        'related_posts': related_posts,
+    })
 
 
 def robots_txt(request):

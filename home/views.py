@@ -20,6 +20,9 @@ class Home(TemplateView):
         return context
 
 
+class About(TemplateView):
+    template_name = "home/about.html"
+
 class ResumeBank(TemplateView):
     template_name = "home/resume_bank.html"
 

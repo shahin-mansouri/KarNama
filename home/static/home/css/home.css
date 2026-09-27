@@ -779,6 +779,73 @@ img { max-width: 100%; display: block; }
   .footer-copy { align-items: flex-start; }
 }
 
+
+/* ===== About page ===== */
+.about-section { padding: 88px 0 0; }
+.about-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 56px;
+}
+.about-heading .section-heading { margin: 0; text-align: right; }
+.about-story {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 32px;
+  align-items: start;
+  margin-bottom: 88px;
+}
+.about-story article h2,
+.about-values-card h3 { margin: 0 0 14px; }
+.about-story article p { color: var(--muted); margin: 0 0 16px; }
+.about-values-card {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+.about-values-card ul { margin: 0; padding: 0; list-style: none; }
+.about-values-card li { padding: 10px 0; border-bottom: 1px dashed var(--line); color: var(--muted); }
+.about-values-card li:last-child { border-bottom: 0; }
+.about-values { margin-bottom: 88px; }
+.value-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+.value-card {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 26px;
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.value-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+.value-card > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: var(--mint);
+  color: var(--coral);
+  font-weight: 800;
+}
+.value-card h3 { margin: 0 0 8px; font-size: 1.05rem; }
+.value-card p { margin: 0; color: var(--muted); font-size: .92rem; }
+.about-team { margin: 0 calc(50% - 50vw); padding: 96px calc(50vw - 50% + 24px); }
+.about-stats { max-width: 900px; margin: 0 auto; }
+@media (max-width: 900px) {
+  .about-heading { flex-direction: column; align-items: start; }
+  .about-heading .section-heading { text-align: center; }
+  .about-story { grid-template-columns: 1fr; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;

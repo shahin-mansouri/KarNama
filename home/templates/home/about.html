@@ -1,0 +1,96 @@
+{% extends 'home/base.html' %}
+
+{% block title %}درباره ما | کارنما{% endblock %}
+{% block meta_description %}با کارنما بیشتر آشنا شوید؛ پلتفرمی برای ساخت رزومه آنلاین حرفه‌ای، معرفی مهارت‌ها و دیده‌شدن توسط کارفرمایان.{% endblock %}
+{% block og_title %}درباره ما | کارنما{% endblock %}
+{% block og_description %}کارنما را بشناسید؛ مأموریت، ارزش‌ها و مسیری که برای ساخت رزومه آنلاین طی می‌کنیم.{% endblock %}
+
+{% block content %}
+<main class="about-section">
+        <div class="home-container">
+                <div class="about-heading">
+                        <div class="section-heading">
+                                <span>About / درباره کارنما</span>
+                                <h1>رزومه آنلاین، مسیر شغلی روشن‌تر</h1>
+                                <p>کارنما با یک هدف ساده متولد شد: هر فرد متخصص بتواند بدون دانش فنی، یک رزومه حرفه‌ای و به‌روز بسازد و بهتر دیده شود.</p>
+                        </div>
+                        <a class="outline-link" href="{% url 'home' %}">بازگشت به خانه <span>↗</span></a>
+                </div>
+
+                <section class="about-story">
+                        <article>
+                                <h2>داستان ما</h2>
+                                <p>خیلی از ما تجربه‌ی ساختن رزومه در قالب‌های قدیمی و ناقص را داشته‌ایم؛ فایلی که همیشه نسخه‌ی جدیدتری دارد و هیچ‌وقت کامل نیست. کارنما ساخته شد تا این تجربه را عوض کند: اطلاعات حرفه‌ای خود را یک‌جا وارد کنید و همیشه یک رزومه‌ی آنلاین به‌روز داشته باشید.</p>
+                                <p>امروز کارنما میزبان بانک رزومه‌ای است که کارفرمایان و همکاران می‌توانند در آن جست‌وجو کنند، با مهارت‌ها و پروژه‌های شما آشنا شوند و برای فرصت‌های شغلی ارتباط بگیرند.</p>
+                        </article>
+                        <aside class="about-values-card">
+                                <h3>چرا کارنما؟</h3>
+                                <ul>
+                                        <li><strong>ساده:</strong> ساخت رزومه بدون درگیری با Word و PDF.</li>
+                                        <li><strong>همیشگی:</strong> یک‌بار بسازید، همه‌جا لینک بدهید.</li>
+                                        <li><strong>دیده‌شدن:</strong> حضور در بانک رزومه و دسترس کارفرمایان.</li>
+                                </ul>
+                        </aside>
+                </section>
+
+                <section class="about-values">
+                        <div class="section-heading">
+                                <span>ارزش‌های ما</span>
+                                <h2>آنچه به آن باور داریم</h2>
+                        </div>
+                        <div class="value-grid">
+                                <article class="value-card">
+                                        <span>۱</span>
+                                        <h3>مالکیت اطلاعات شما</h3>
+                                        <p>رزومه شما متعلق به خودتان است. هر زمان بخواهید می‌توانید آن را ویرایش، منتشر یا حذف کنید.</p>
+                                </article>
+                                <article class="value-card">
+                                        <span>۲</span>
+                                        <h3>سادگی و سرعت</h3>
+                                        <p>رابط کاربری فارسی و راست‌به‌چپ طراحی کرده‌ایم تا در چند دقیقه رزومه‌تان آماده شود.</p>
+                                </article>
+                                <article class="value-card">
+                                        <span>۳</span>
+                                        <h3>رشد مستمر</h3>
+                                        <p>رزومه یک سند زنده است؛ مهارت‌ها، پروژه‌ها و تجربه‌های تازه را به‌راحتی به آن اضافه کنید.</p>
+                                </article>
+                                <article class="value-card">
+                                        <span>۴</span>
+                                        <h3>دیده‌شدن واقعی</h3>
+                                        <p>بانک رزومه و وبلاگ کاری، شانس آشنایی کارفرما و هم‌صنف‌های شما با توانمندی‌هایتان را بالا می‌برد.</p>
+                                </article>
+                        </div>
+                </section>
+
+                <section class="about-team steps-section">
+                        <div class="home-container">
+                                <div class="section-heading">
+                                        <span>Team / تیم ما</span>
+                                        <h2>مسیری که طی می‌کنیم</h2>
+                                        <p>کارنما توسط گروه کوچکی از توسعه‌دهندگان و علاقه‌مندان به حوزه شغل و career ساخته شده و قدم‌به‌قدم با بازخورد کاربران رشد می‌کند.</p>
+                                </div>
+                                <ul class="hero-stats about-stats">
+                                        <li><strong>رزومه‌سازی آنلاین</strong><span>ساخت، ویرایش و انتشار در چند دقیقه</span></li>
+                                        <li><strong>بانک رزومه</strong><span>جست‌وجوی تخصص‌ها و افراد</span></li>
+                                        <li><strong>وبلاگ و پیام‌رسانی</strong><span>یادگیری و ارتباط مستقیم</span></li>
+                                </ul>
+                        </div>
+                </section>
+
+                <section class="home-cta about-cta">
+                        <div class="home-container">
+                                <span>همراه ما باشید</span>
+                                <h2>رزومه حرفه‌ای خود را همین امروز بسازید</h2>
+                                <div class="hero-actions">
+                                        {% if user.is_authenticated %}
+                                                <a class="button button-accent" href="{% url 'profile' user.username %}">رزومه من</a>
+                                        {% else %}
+                                                <a class="button button-accent" href="{% url 'login' %}">شروع رایگان</a>
+                                        {% endif %}
+                                        <a class="outline-link" href="{% url 'resume_bank' %}">مشاهده بانک رزومه <span>←</span></a>
+                                </div>
+                        </div>
+                </section>
+        </div>
+</main>
+{% endblock %}

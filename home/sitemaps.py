@@ -6,6 +6,7 @@ from .models import BlogPost
 
 
 class StaticViewSitemap(Sitemap):
+    protocol = "https"
     priority = 0.8
     changefreq = "weekly"
 
@@ -22,6 +23,7 @@ class StaticViewSitemap(Sitemap):
 
 
 class BlogPostSitemap(Sitemap):
+    protocol = "https"
     priority = 0.6
     changefreq = "weekly"
 
@@ -33,6 +35,7 @@ class BlogPostSitemap(Sitemap):
 
 
 class ProfileSitemap(Sitemap):
+    protocol = "https"
     priority = 0.7
     changefreq = "weekly"
 

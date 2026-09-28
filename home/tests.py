@@ -90,5 +90,7 @@ class BlogTests(TestCase):
 		response = self.client.get(reverse('django_sitemap'), HTTP_HOST='127.0.0.1')
 
 		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, '<loc>https://127.0.0.1/</loc>')
+		self.assertNotContains(response, 'http://127.0.0.1/')
 		self.assertContains(response, '/blog/post-0/')
 		self.assertNotContains(response, '/blog/private-post/')

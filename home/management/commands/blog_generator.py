@@ -158,25 +158,62 @@ def _parse_model_response(response):
     raise ValueError("Model response was not valid JSON.")
 
 
+
+import re
+
 def _validate_blog_data(blog_json, expected_category):
+
     if not isinstance(blog_json, dict):
         raise ValueError("Model response must be a JSON object.")
 
-    required_fields = ("title", "excerpt", "content", "category")
-    if any(not isinstance(blog_json.get(field), str) or not blog_json[field].strip()
-           for field in required_fields):
-        raise ValueError("Model response is missing required article fields.")
+    # فیلدهای موردنیاز مدل BlogPost
+    required_fields = (
+        "title",
+        "slug",
+        "excerpt",
+        "content",
+        "category",
+    )
 
+    # بررسی وجود و معتبر بودن فیلدها
+    for field in required_fields:
+        value = blog_json.get(field)
+
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(
+                f"Model response contains an invalid or empty '{field}' field."
+            )
+
+    # بررسی دسته‌بندی
     if blog_json["category"] != expected_category:
-        raise ValueError("Model response category does not match the requested category.")
+        blog_json["category"] = expected_category
+        pass
+        # raise ValueError(
+        #     "Model response category does not match the requested category."
+        # )
 
+    # بررسی محدودیت طول عنوان
     if len(blog_json["title"]) > 180:
-        raise ValueError("Generated article title exceeds the maximum length.")
+        raise ValueError("Generated article title exceeds 180 characters.")
 
-    if len(blog_json["excerpt"]) > 100:
-        raise ValueError("Generated article excerpt exceeds 100 characters.")
+    # بررسی محدودیت طول خلاصه
+    if len(blog_json["excerpt"]) > 300:
+        raise ValueError("Generated article excerpt exceeds 300 characters.")
+
+    # بررسی محدودیت طول اسلاگ
+    if len(blog_json["slug"]) > 200:
+        raise ValueError("Generated article slug exceeds 200 characters.")
+
+    # بررسی فرمت اسلاگ
+    if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", blog_json["slug"]):
+        raise ValueError("Generated article slug has an invalid format.")
+
+    # بررسی محتوای HTML
+    if not re.search(r"<(h2|h3|p|ul|ol|blockquote)\b", blog_json["content"]):
+        raise ValueError("Generated article content does not contain valid HTML structure.")
 
     return blog_json
+
 
 
 def _get_or_create_category(category_name):
@@ -255,19 +292,118 @@ def blog_generator(progress=None):
     )
 
 
+
 def build_prompt(categorie):
     return f"""
-                برای یک مقاله فارسی حرفه‌ای و کاربردی درباره دسته «{categorie}» بنویس.
+به‌عنوان یک متخصص ارشد SEO، استراتژیست محتوا و نویسنده حرفه‌ای
+در حوزه کاریابی، استخدام، ساخت رزومه و توسعه شغلی فعالیت کن.
 
-                مقاله باید مناسب SEO، غیرکلیشه‌ای، کاربردی و مخصوص افراد جویای کار و متخصصان باشد.
-                عنوان جذاب، خلاصه حداکثر 100 کاراکتر و محتوای کامل با تیترهای مناسب داشته باشد.
+وظیفه تو تولید یک مقاله فارسی حرفه‌ای، اختصاصی، کاربردی و
+بهینه‌شده برای موتورهای جستجو درباره دسته‌بندی «{categorie}» است.
 
-                فقط JSON معتبر و بدون Markdown برگردان:
+هدف، تولید محتوایی است که علاوه بر داشتن پتانسیل کسب جایگاه مناسب
+در نتایج گوگل، واقعاً به مخاطبان سایت کمک کند و ارزش مطالعه داشته باشد.
 
-                {{
-                    "title": "عنوان مقاله",
-                    "excerpt": "خلاصه مقاله",
-                    "content": "متن کامل مقاله",
-                    "category": "{categorie}"
-                }}
-                """.strip()
+### ۱. انتخاب موضوع مقاله
+- موضوعی مشخص، جذاب و متناسب با دسته‌بندی انتخاب کن.
+- موضوع باید یکی از نیازها، چالش‌ها یا سؤالات واقعی کارجویان و متخصصان را هدف قرار دهد.
+- از انتخاب موضوعات بیش از حد عمومی، تکراری و کلیشه‌ای خودداری کن.
+- مقاله باید زاویه دید مشخص و ارزش افزوده داشته باشد.
+- از بازنویسی سطحی مقالات رایج اینترنت خودداری کن.
+
+### ۲. استانداردهای نگارش
+- لحن رسمی، روان، حرفه‌ای و قابل فهم باشد.
+- مخاطبان شامل کارجویان، کارمندان، متخصصان، مدیران و کارفرمایان هستند.
+- مطالب دقیق، کاربردی، قابل اجرا و متناسب با نیاز مخاطب باشند.
+- از مثال‌های واقع‌گرایانه و سناریوهای کاربردی استفاده کن.
+- مراحل اجرایی، راهکارها، نکات تخصصی و اشتباهات رایج را در صورت تناسب توضیح بده.
+- از مقدمه‌های طولانی، جملات انگیزشی بی‌محتوا و تکرار مطالب خودداری کن.
+- هیچ آمار، پژوهش، نقل‌قول یا ادعای تخصصی ساختگی ارائه نکن.
+
+### ۳. اصول SEO
+- عنوان مقاله جذاب، دقیق و دارای کلمه کلیدی اصلی باشد.
+- کلمه کلیدی اصلی را طبیعی در عنوان، مقدمه و بخش‌های مرتبط استفاده کن.
+- از کلمات کلیدی مرتبط و عبارات هم‌معنی به شکل طبیعی استفاده کن.
+- ساختار محتوا با هدف جستجوی کاربر (Search Intent) مطابقت داشته باشد.
+- تیترها توصیفی، جذاب و دارای ساختار سلسله‌مراتبی باشند.
+- از Keyword Stuffing خودداری کن.
+- محتوا باید جامع و پاسخگوی سؤال اصلی مخاطب باشد.
+- مقاله را صرفاً برای افزایش تعداد کلمات طولانی نکن.
+
+### ۴. ساختار مقاله
+محتوا باید متناسب با موضوع شامل موارد زیر باشد:
+- مقدمه کوتاه و هدفمند.
+- بخش‌های اصلی با تیترهای H2.
+- زیربخش‌های تکمیلی با تیترهای H3.
+- توضیحات تخصصی و کاربردی.
+- مثال‌ها و راهکارهای اجرایی.
+- اشتباهات رایج و روش جلوگیری از آن‌ها.
+- جمع‌بندی و نتیجه‌گیری کاربردی.
+- در صورت تناسب، ۳ تا ۵ سؤال متداول همراه با پاسخ.
+
+از ایجاد تیترهای غیرضروری یا تکراری خودداری کن.
+
+### ۵. استاندارد HTML
+مقدار content باید یک رشته HTML معتبر و آماده ذخیره در Django باشد.
+
+فقط از تگ‌های زیر استفاده کن:
+h2, h3, p, ul, ol, li, strong, blockquote
+
+قوانین:
+- از h1 استفاده نکن؛ عنوان اصلی در فیلد title ذخیره می‌شود.
+- از Markdown استفاده نکن.
+- هیچ CSS یا JavaScript تولید نکن.
+- از تگ‌های html، head و body استفاده نکن.
+- ساختار HTML مرتب، معنایی و استاندارد باشد.
+- پاراگراف‌ها کوتاه و خوانا باشند.
+
+### ۶. استاندارد فیلدهای خروجی
+
+title:
+عنوان اصلی مقاله با حداکثر ۱۸۰ کاراکتر.
+عنوان باید جذاب، طبیعی و مناسب SEO باشد.
+
+slug:
+یک نشانی انگلیسی، کوتاه، خوانا و مرتبط با موضوع مقاله تولید کن.
+فقط از حروف کوچک انگلیسی، اعداد و خط تیره استفاده کن.
+فاصله، حروف فارسی و کاراکترهای غیرمجاز نداشته باشد.
+
+excerpt:
+خلاصه‌ای جذاب، حرفه‌ای و کاربردی با حداکثر ۳۰۰ کاراکتر.
+خلاصه باید موضوع مقاله و مهم‌ترین فایده مطالعه آن را منتقل کند.
+
+content:
+متن کامل مقاله به‌صورت HTML معتبر و ساختاریافته.
+محتوا باید جامع، غیرتکراری و آماده انتشار باشد.
+
+category:
+مقدار این فیلد باید دقیقاً برابر با دسته‌بندی ورودی باشد:
+{categorie}
+
+### ۷. قوانین الزامی خروجی JSON
+
+فقط یک JSON معتبر برگردان.
+هیچ توضیحی قبل یا بعد از JSON ننویس.
+از Markdown و Code Block استفاده نکن.
+
+ساختار خروجی دقیقاً باید به شکل زیر باشد:
+
+{{
+    "title": "عنوان مقاله",
+    "slug": "english-article-slug",
+    "excerpt": "خلاصه مقاله",
+    "content": "<h2>عنوان بخش</h2><p>متن مقاله</p>",
+    "category": "{categorie}"
+}}
+
+قوانین نهایی:
+- دقیقاً همین ۵ کلید را تولید کن.
+- هیچ کلید اضافی تولید نکن.
+- فیلدهای published_at و is_published را تولید نکن.
+- مقدار category باید دقیقاً برابر با «{categorie}» باشد.
+- تمام رشته‌ها باید با Double Quote محصور شوند.
+- کاراکترهای نقل‌قول داخل رشته‌ها باید Escape شوند.
+- خروجی باید مستقیماً با json.loads در Python قابل پردازش باشد.
+- محتوای HTML باید داخل رشته content قرار بگیرد.
+- هیچ توضیح یا محتوای اضافی خارج از JSON تولید نکن.
+""".strip()

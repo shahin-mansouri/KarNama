@@ -239,6 +239,22 @@ class BlogTests(TestCase):
 		)
 		self.assertEqual(self.client.get(reverse('blog_detail', args=['missing'])).status_code, 404)
 
+	def test_blog_detail_renders_allowed_html_and_removes_unsafe_markup(self):
+		post = BlogPost.objects.get(slug='post-0')
+		post.content = (
+			'<h2>عنوان بخش</h2><p onclick="alert(1)">متن <strong>مهم</strong></p>'
+			'<script>alert(1)</script>'
+		)
+		post.save(update_fields=['content'])
+
+		response = self.client.get(reverse('blog_detail', args=['post-0']))
+
+		self.assertContains(response, '<h2>عنوان بخش</h2>', html=True)
+		self.assertContains(response, '<p>متن <strong>مهم</strong></p>', html=True)
+		self.assertNotContains(response, 'onclick')
+		self.assertNotContains(response, '<script>')
+		self.assertNotContains(response, 'alert(1)')
+
 	def test_sitemap_includes_published_blog_details(self):
 		response = self.client.get(reverse('django_sitemap'), HTTP_HOST='127.0.0.1')
 

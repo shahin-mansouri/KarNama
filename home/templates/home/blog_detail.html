@@ -1,4 +1,5 @@
 {% extends 'home/base.html' %}
+{% load blog_tags %}
 
 {% block title %}{{ post.title }} | کارنما{% endblock %}
 {% block meta_description %}{{ post.excerpt }}{% endblock %}
@@ -25,7 +26,7 @@
       </div>
     </div>
     <p class="blog-article-excerpt">{{ post.excerpt }}</p>
-    <div class="blog-article-content">{{ post.content|linebreaks }}</div>
+    <div class="blog-article-content">{{ post.content|render_blog_content }}</div>
     <a class="outline-link" href="{% url 'blog_list' %}">بازگشت به همه مطالب <span>←</span></a>
   </article>
 </main>

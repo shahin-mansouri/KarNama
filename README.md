@@ -97,7 +97,7 @@ Generate and publish one career-focused article from the project root:
 python .\manage.py blog_generator
 ```
 
-When the Django site is running as a single process with `runserver` or a supported WSGI/ASGI server, it also publishes an article every five hours. Automatic publishing is silent; progress and estimated remaining time appear only while running the management command above.
+When the Django site is running as a single process with `runserver` or a supported WSGI/ASGI server, it attempts to publish an article every five minutes. If generation fails or the model returns invalid content, it stays silent and waits five minutes before trying again. Progress and estimated remaining time appear only while running the management command above.
 
 ### 5. Apply migrations
 

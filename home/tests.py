@@ -11,6 +11,31 @@ from .models import BlogPost, Category
 
 
 class BlogGeneratorCommandTests(SimpleTestCase):
+	def test_generator_rejects_unexpected_article_data(self):
+		from home.management.commands.blog_generator import _validate_blog_data
+
+		with self.assertRaises(ValueError):
+			_validate_blog_data(
+				{
+					'title': 'عنوان',
+					'excerpt': 'خلاصه',
+					'content': 'متن',
+					'category': 'استخدام',
+				},
+				expected_category='رزومه موفق',
+			)
+
+		with self.assertRaises(ValueError):
+			_validate_blog_data(
+				{
+					'title': 'عنوان',
+					'excerpt': 'خلاصه' * 21,
+					'content': 'متن',
+					'category': 'رزومه موفق',
+				},
+				expected_category='رزومه موفق',
+			)
+
 	def test_scheduler_does_not_start_for_manual_generation_command(self):
 		from home.apps import _is_web_server_process
 
@@ -83,6 +108,35 @@ class BlogGeneratorCommandTests(SimpleTestCase):
 
 		self.assertEqual(output.getvalue(), '')
 		generate_blog.assert_called_once_with()
+
+	def test_scheduler_waits_five_minutes_between_attempts(self):
+		from home import blog_scheduler
+
+		class StopAfterRetry:
+			def __init__(self):
+				self.calls = 0
+
+			def wait(self, interval):
+				self.calls += 1
+				self_intervals.append(interval)
+				return self.calls == 2
+
+		self_intervals = []
+		stop_event = StopAfterRetry()
+		with (
+			patch.object(blog_scheduler, '_stop_event', stop_event),
+			patch(
+				'home.management.commands.blog_generator.publish_generated_blog',
+				side_effect=ValueError('bad model response'),
+			),
+			patch('home.blog_scheduler.close_old_connections'),
+		):
+			blog_scheduler._publish_periodically()
+
+		self.assertEqual(
+			self_intervals,
+			[5 * 60, 5 * 60],
+		)
 
 
 class BlogPostPublishingTests(TestCase):

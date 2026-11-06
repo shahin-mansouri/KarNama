@@ -158,6 +158,27 @@ def _parse_model_response(response):
     raise ValueError("Model response was not valid JSON.")
 
 
+def _validate_blog_data(blog_json, expected_category):
+    if not isinstance(blog_json, dict):
+        raise ValueError("Model response must be a JSON object.")
+
+    required_fields = ("title", "excerpt", "content", "category")
+    if any(not isinstance(blog_json.get(field), str) or not blog_json[field].strip()
+           for field in required_fields):
+        raise ValueError("Model response is missing required article fields.")
+
+    if blog_json["category"] != expected_category:
+        raise ValueError("Model response category does not match the requested category.")
+
+    if len(blog_json["title"]) > 180:
+        raise ValueError("Generated article title exceeds the maximum length.")
+
+    if len(blog_json["excerpt"]) > 100:
+        raise ValueError("Generated article excerpt exceeds 100 characters.")
+
+    return blog_json
+
+
 def _get_or_create_category(category_name):
     return Category.objects.get_or_create(
         name=category_name,
@@ -223,11 +244,15 @@ def blog_generator(progress=None):
         return progress.run_stage(
             "مرحله ۳ از ۵: اعتبارسنجی محتوای مقاله",
             1,
-            lambda: _parse_model_response(response),
+            lambda: _validate_blog_data(
+                _parse_model_response(response), expected_category=category
+            ),
             remaining_after_seconds=4,
         )
 
-    return _parse_model_response(request())
+    return _validate_blog_data(
+        _parse_model_response(request()), expected_category=category
+    )
 
 
 def build_prompt(categorie):

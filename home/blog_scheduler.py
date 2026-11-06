@@ -10,17 +10,17 @@ _stop_event = threading.Event()
 
 
 def _publish_periodically():
-    while True:
-        if not _stop_event.wait(PUBLISH_INTERVAL_SECONDS):
-            close_old_connections()
-            try:
-                from home.management.commands.blog_generator import publish_generated_blog
+    while not _stop_event.wait(PUBLISH_INTERVAL_SECONDS):
+        close_old_connections()
+        try:
+            from home.management.commands.blog_generator import publish_generated_blog
 
-                publish_generated_blog()
-            except Exception:
-                pass
-            finally:
-                close_old_connections()
+            publish_generated_blog()
+        except Exception:
+            # Retry only after the next full interval; automatic publishing stays silent.
+            pass
+        finally:
+            close_old_connections()
 
 
 def start_blog_scheduler():

@@ -195,6 +195,28 @@ class ResumeDiscoveryTests(TestCase):
 		self.assertEqual(list(response.context['resume_users']), [self.developer])
 
 
+class BlogContentRenderingTests(SimpleTestCase):
+	def test_legacy_plain_text_preserves_paragraphs(self):
+		from home.templatetags.blog_tags import render_blog_content
+
+		rendered = render_blog_content('پاراگراف اول\nادامه همان پاراگراف\n\nپاراگراف دوم')
+
+		self.assertEqual(
+			rendered,
+			'<p>پاراگراف اول<br>ادامه همان پاراگراف</p><p>پاراگراف دوم</p>',
+		)
+
+	def test_structured_html_keeps_safe_markup_and_removes_unsafe_markup(self):
+		from home.templatetags.blog_tags import render_blog_content
+
+		rendered = render_blog_content(
+			'<h2>عنوان بخش</h2><p onclick="alert(1)">متن <strong>مهم</strong></p>'
+			'<script>alert(1)</script>'
+		)
+
+		self.assertEqual(rendered, '<h2>عنوان بخش</h2><p>متن <strong>مهم</strong></p>')
+
+
 class BlogTests(TestCase):
 	def setUp(self):
 		published_at = timezone.now()

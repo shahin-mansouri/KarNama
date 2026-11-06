@@ -1,3 +1,4 @@
+import re
 from html import escape
 from html.parser import HTMLParser
 
@@ -7,7 +8,7 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
-_ALLOWED_TAGS = {"blockquote", "h2", "h3", "li", "ol", "p", "strong", "ul"}
+_ALLOWED_TAGS = {"blockquote", "br", "h2", "h3", "li", "ol", "p", "strong", "ul"}
 _SUPPRESSED_TAGS = {"script", "style"}
 
 
@@ -17,6 +18,7 @@ class _BlogHTMLSanitizer(HTMLParser):
         self.parts = []
         self.open_tags = []
         self.suppressed_depth = 0
+        self.has_allowed_tags = False
 
     def handle_starttag(self, tag, attrs):
         if self.suppressed_depth:
@@ -27,8 +29,10 @@ class _BlogHTMLSanitizer(HTMLParser):
         if tag in _SUPPRESSED_TAGS:
             self.suppressed_depth = 1
         elif tag in _ALLOWED_TAGS:
+            self.has_allowed_tags = True
             self.parts.append(f"<{tag}>")
-            self.open_tags.append(tag)
+            if tag != "br":
+                self.open_tags.append(tag)
 
     def handle_endtag(self, tag):
         if self.suppressed_depth:
@@ -60,4 +64,14 @@ class _BlogHTMLSanitizer(HTMLParser):
 @register.filter
 def render_blog_content(content):
     sanitizer = _BlogHTMLSanitizer()
-    return mark_safe(sanitizer.sanitized_html(content))
+    sanitized_content = sanitizer.sanitized_html(content)
+    if sanitizer.has_allowed_tags:
+        return mark_safe(sanitized_content)
+
+    paragraphs = re.split(r"\n[ \t]*\n+", content.strip())
+    rendered_paragraphs = [
+        "<p>{}</p>".format("<br>".join(escape(line, quote=False) for line in paragraph.splitlines()))
+        for paragraph in paragraphs
+        if paragraph.strip()
+    ]
+    return mark_safe("".join(rendered_paragraphs))

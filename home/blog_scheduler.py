@@ -3,7 +3,7 @@ import threading
 from django.db import close_old_connections
 
 
-PUBLISH_INTERVAL_SECONDS = 15 * 60
+PUBLISH_INTERVAL_SECONDS = 60 * 60
 _scheduler_started = False
 _scheduler_lock = threading.Lock()
 _stop_event = threading.Event()

@@ -1,9 +1,108 @@
-from django.test import TestCase
+from io import StringIO
+from unittest.mock import patch
+
+from django.core.management import call_command
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
 from account.models import Skill, UserCustom, UserProfile
-from .models import BlogPost
+from .models import BlogPost, Category
+
+
+class BlogGeneratorCommandTests(SimpleTestCase):
+	def test_scheduler_does_not_start_for_manual_generation_command(self):
+		from home.apps import _is_web_server_process
+
+		with patch('home.apps.sys.argv', ['manage.py', 'blog_generator']):
+			self.assertFalse(_is_web_server_process())
+
+	def test_scheduler_starts_for_runserver_child_process(self):
+		from home.apps import _is_web_server_process
+
+		with (
+			patch('home.apps.sys.argv', ['manage.py', 'runserver']),
+			patch.dict('os.environ', {'RUN_MAIN': 'true'}),
+		):
+			self.assertTrue(_is_web_server_process())
+
+	def test_manual_command_shows_progress(self):
+		blog_json = {
+			'title': 'عنوان آزمایشی',
+			'excerpt': 'خلاصه',
+			'content': 'متن',
+			'category': 'رزومه موفق',
+		}
+
+		def generate_blog(progress):
+			progress.write_stage('مرحله ۱ از ۵: آماده‌سازی', 65)
+			return blog_json
+
+		output = StringIO()
+		with (
+			patch(
+				'home.management.commands.blog_generator.blog_generator',
+				side_effect=generate_blog,
+			),
+			patch(
+				'home.management.commands.blog_generator._get_or_create_category',
+				return_value=object(),
+			),
+			patch('home.management.commands.blog_generator._save_blog_post'),
+		):
+			call_command('blog_generator', stdout=output)
+
+		self.assertIn('مرحله ۱ از ۵', output.getvalue())
+		self.assertIn('مرحله ۵ از ۵', output.getvalue())
+		self.assertIn('با موفقیت منتشر شد', output.getvalue())
+
+	def test_automatic_publisher_does_not_write_progress(self):
+		from home.management.commands.blog_generator import publish_generated_blog
+
+		blog_json = {
+			'title': 'عنوان آزمایشی',
+			'excerpt': 'خلاصه',
+			'content': 'متن',
+			'category': 'رزومه موفق',
+		}
+		output = StringIO()
+		with (
+			patch(
+				'home.management.commands.blog_generator.blog_generator',
+				return_value=blog_json,
+			) as generate_blog,
+			patch(
+				'home.management.commands.blog_generator._get_or_create_category',
+				return_value=object(),
+			),
+			patch('home.management.commands.blog_generator._save_blog_post'),
+			patch('sys.stdout', output),
+			patch('sys.stderr', output),
+		):
+			publish_generated_blog()
+
+		self.assertEqual(output.getvalue(), '')
+		generate_blog.assert_called_once_with()
+
+
+class BlogPostPublishingTests(TestCase):
+	def test_repeated_title_gets_a_unique_slug(self):
+		from home.management.commands.blog_generator import _save_blog_post
+
+		category = Category.objects.create(name='رزومه موفق', slug='resume-success')
+		blog_json = {
+			'title': 'عنوان آزمایشی',
+			'excerpt': 'خلاصه',
+			'content': 'متن',
+		}
+
+		_save_blog_post(blog_json, category)
+		_save_blog_post(blog_json, category)
+
+		self.assertEqual(
+			list(BlogPost.objects.order_by('id').values_list('slug', flat=True)),
+			['عنوان-آزمایشی', 'عنوان-آزمایشی-2'],
+		)
 
 
 class ResumeDiscoveryTests(TestCase):

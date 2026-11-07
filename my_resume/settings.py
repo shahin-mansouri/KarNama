@@ -42,7 +42,8 @@ DASHSCOPE_MODEL = os.getenv('DASHSCOPE_MODEL', 'qwen3.8-max')
 KILO_API_KEY = os.getenv('KILO_API_KEY')
 KILO_MODEL = "dots-studio/dots-3-note-preview:free"
 KILO_BASE_URL = "https://api.kilo.ai/api/gateway"
-0
+
+BALE_TOKEN = os.getenv('BALE_TOKEN', '')
 
 
 # Application definition

@@ -11,6 +11,30 @@ from .models import BlogPost, Category
 
 
 class BlogGeneratorCommandTests(SimpleTestCase):
+	def test_bale_message_formats_article_html_as_markdown(self):
+		from home.management.commands.blog_generator import _format_bale_message
+
+		message = _format_bale_message(
+			{
+				'title': 'عنوان مقاله',
+				'excerpt': 'خلاصه مقاله',
+				'content': (
+					'<h2>عنوان بخش</h2>'
+					'<p>متن <strong>مهم</strong> مقاله</p>'
+					'<ul><li>نکته اول</li><li>نکته دوم</li></ul>'
+					'<blockquote><p>نقل‌قول</p></blockquote>'
+				),
+			}
+		)
+
+		self.assertIn(' *عنوان مقاله* ', message)
+		self.assertIn(' *عنوان بخش* ', message)
+		self.assertIn('متن *مهم* مقاله', message)
+		self.assertIn('• نکته اول\n• نکته دوم', message)
+		self.assertIn('> نقل‌قول', message)
+		self.assertNotIn('<h2>', message)
+		self.assertNotIn('<strong>', message)
+
 	def test_generator_rejects_unexpected_article_data(self):
 		from home.management.commands.blog_generator import _validate_blog_data
 
@@ -150,8 +174,9 @@ class BlogPostPublishingTests(TestCase):
 			'content': 'متن',
 		}
 
-		_save_blog_post(blog_json, category)
-		_save_blog_post(blog_json, category)
+		with patch('home.management.commands.blog_generator.send_message'):
+			_save_blog_post(blog_json, category)
+			_save_blog_post(blog_json, category)
 
 		self.assertEqual(
 			list(BlogPost.objects.order_by('id').values_list('slug', flat=True)),

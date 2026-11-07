@@ -1,7 +1,9 @@
 import json
 import random
+import re
 import threading
 import time
+from html.parser import HTMLParser
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -10,6 +12,7 @@ from django.utils.text import slugify
 from openai import OpenAI
 
 from home.models import BlogPost, Category
+from .send_to_bale import send_message
 
 
 MODEL_RESPONSE_ESTIMATE_SECONDS = 60
@@ -159,8 +162,6 @@ def _parse_model_response(response):
 
 
 
-import re
-
 def _validate_blog_data(blog_json, expected_category):
 
     if not isinstance(blog_json, dict):
@@ -223,6 +224,106 @@ def _get_or_create_category(category_name):
     )[0]
 
 
+class _BaleContentParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.parts = []
+        self.list_stack = []
+        self.blockquote_depth = 0
+
+    def _line_break(self, count=1):
+        while (
+            self.parts
+            and self.parts[-1].isspace()
+            and "\n" not in self.parts[-1]
+        ):
+            self.parts.pop()
+        text = "".join(self.parts)
+        trailing_newlines = len(text) - len(text.rstrip("\n"))
+        self.parts.append("\n" * max(0, count - trailing_newlines))
+
+    def _append_inline(self, text):
+        if (
+            self.parts
+            and self.parts[-1].endswith((" ", "\t"))
+            and text.startswith((" ", "\t"))
+        ):
+            text = text.lstrip(" \t")
+        self.parts.append(text)
+
+    def handle_starttag(self, tag, _attrs):
+        if tag in {"h2", "h3"} or (
+            tag == "p" and not self.blockquote_depth
+        ) or tag == "blockquote":
+            self._line_break(2)
+
+        if tag in {"h2", "h3", "strong"}:
+            self._append_inline(" *")
+        elif tag in {"ul", "ol"}:
+            self.list_stack.append({"tag": tag, "count": 0})
+        elif tag == "li":
+            self._line_break()
+            if self.list_stack:
+                current_list = self.list_stack[-1]
+                current_list["count"] += 1
+                marker = (
+                    f"{current_list['count']}."
+                    if current_list["tag"] == "ol"
+                    else "•"
+                )
+                self.parts.append(
+                    f"{'  ' * (len(self.list_stack) - 1)}{marker} "
+                )
+        elif tag == "br":
+            self._line_break()
+        elif tag == "blockquote":
+            self._append_inline("> ")
+            self.blockquote_depth += 1
+
+    def handle_endtag(self, tag):
+        if tag in {"h2", "h3", "strong"}:
+            self._append_inline("* ")
+        elif tag == "li":
+            self._line_break()
+        elif tag in {"ul", "ol"} and self.list_stack:
+            self.list_stack.pop()
+            self._line_break(2)
+        elif tag == "blockquote":
+            self.blockquote_depth -= 1
+            self._line_break(2)
+        elif tag in {"h2", "h3"} or (
+            tag == "p" and not self.blockquote_depth
+        ):
+            self._line_break(2)
+
+    def handle_data(self, data):
+        self._append_inline(re.sub(r"\s+", " ", data))
+
+
+def _html_to_bale_markdown(content):
+    parser = _BaleContentParser()
+    parser.feed(content)
+    parser.close()
+    return re.sub(r"\n{3,}", "\n\n", "".join(parser.parts)).strip("\n")
+
+
+def _format_bale_message(blog_json, category, slug):
+    title = blog_json["title"].strip()
+    excerpt = re.sub(r"\s+", " ", blog_json["excerpt"]).strip()
+    content = _html_to_bale_markdown(blog_json["content"])
+    return (
+        f" #{category.name.replace(' ', '_')} \n\n"
+        f" *{title}* \n\n"
+        f" *خلاصه مطلب* \n{excerpt}\n\n"
+        f"مقاله: https://karnamma.ir/blog/{slug}\n\n"
+        f" *متن مقاله* \n{content}\n\n"
+        f"درباره سایت: https://karnamma.ir/about/ \n\n"
+        f" بانک رزومه: https://karnamma.ir/resume-bank/ \n\n"
+        f"انتشار رزومه با کارنما: https://karnamma.ir/#steps \n\n"
+        f"قابلیت های کارنما: https://karnamma.ir/#features \n\n"
+    )
+
+
 def _save_blog_post(blog_json, category):
     base_slug = (
         slugify(blog_json["title"], allow_unicode=True)[:190].rstrip("-")
@@ -244,6 +345,7 @@ def _save_blog_post(blog_json, category):
         published_at=timezone.now(),
         is_published=True,
     )
+    send_message(_format_bale_message(blog_json, category, slug))
 
 
 def publish_generated_blog():

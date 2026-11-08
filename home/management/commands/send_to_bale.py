@@ -1,23 +1,18 @@
 from bale import Bot
 from django.conf import settings
-import asyncio
 
 
 TOKEN = settings.BALE_TOKEN
 CHANNEL_ID = "@karnamma"
-# client = Bot(token=TOKEN)
 
 
-client = Bot(token=TOKEN)
-
-
-def send_message(MESSAGE):
-
+def send_message(message):
+    client = Bot(token=TOKEN)
 
     @client.event
     async def on_ready():
         try:
-            await client.send_message(CHANNEL_ID, MESSAGE)
+            await client.send_message(CHANNEL_ID, message)
             print("Message sent successfully!")
 
         except Exception as e:
@@ -28,5 +23,4 @@ def send_message(MESSAGE):
 
 
     client.run()
-
 

@@ -1,3 +1,4 @@
+import asyncio
 from io import StringIO
 from unittest.mock import patch
 
@@ -11,6 +12,38 @@ from .models import BlogPost, Category
 
 
 class BlogGeneratorCommandTests(SimpleTestCase):
+	def test_bale_sends_each_message_once_with_a_fresh_client(self):
+		from home.management.commands.send_to_bale import send_message
+
+		sent_messages = []
+
+		class FakeBot:
+			def __init__(self, token):
+				self.handlers = []
+
+			def event(self, handler):
+				self.handlers.append(handler)
+				return handler
+
+			def run(self):
+				asyncio.run(self.handlers[0]())
+
+			async def send_message(self, channel_id, message):
+				sent_messages.append(message)
+
+			async def close(self):
+				pass
+
+		with patch(
+			'home.management.commands.send_to_bale.Bot',
+			side_effect=FakeBot,
+		) as bot_factory:
+			send_message('مقاله اول')
+			send_message('مقاله دوم')
+
+		self.assertEqual(bot_factory.call_count, 2)
+		self.assertEqual(sent_messages, ['مقاله اول', 'مقاله دوم'])
+
 	def test_bale_message_formats_article_html_as_markdown(self):
 		from home.management.commands.blog_generator import _format_bale_message
 

@@ -45,11 +45,69 @@ class PhoneLoginTests(TestCase):
 		otp = OTPCode.objects.get(pk=self.client.session['otp_id'])
 		self.assertNotEqual(otp.code_hash, sent_code)
 		self.assertFalse(otp.used_at)
+		self.assertEqual(self.client.session['otp_phone'], self.phone)
+		response = self.client.get(reverse('login'))
+		self.assertContains(response, self.phone)
+		self.assertNotContains(response, 'None')
+		self.assertContains(response, '۰۲:۰۰')
 
 		response = self.client.post(reverse('login'), {'code': sent_code})
 
 		self.assertRedirects(response, reverse('dashboard'))
 		self.assertEqual(int(self.client.session['_auth_user_id']), self.user.pk)
+
+	@patch('account.views.SMS')
+	def test_resend_requires_two_minutes_and_issues_a_new_code(self, sms_class):
+		sms_class.return_value.send_code.return_value = SimpleNamespace(status_code=200)
+		self.client.post(reverse('login'), {'phone_number': self.phone})
+		first_code = sms_class.return_value.send_code.call_args.args[1]
+		first_otp_id = self.client.session['otp_id']
+
+		response = self.client.post(reverse('login'), {'action': 'resend'})
+
+		self.assertRedirects(response, reverse('login'))
+		sms_class.return_value.send_code.assert_called_once()
+
+		session = self.client.session
+		session['otp_resend_at'] = 0
+		session.save()
+		response = self.client.post(reverse('login'), {'action': 'resend'})
+
+		self.assertRedirects(response, reverse('login'))
+		self.assertEqual(sms_class.return_value.send_code.call_count, 2)
+		self.assertEqual(sms_class.return_value.send_code.call_args.args[0], self.phone)
+		new_otp = OTPCode.objects.get(pk=self.client.session['otp_id'])
+		self.assertNotEqual(new_otp.pk, first_otp_id)
+		self.assertNotEqual(first_code, sms_class.return_value.send_code.call_args.args[1])
+		self.assertEqual(self.client.session['otp_phone'], self.phone)
+
+		response = self.client.post(reverse('login'), {
+			'code': sms_class.return_value.send_code.call_args.args[1],
+		})
+		self.assertRedirects(response, reverse('dashboard'))
+
+	@patch('account.views.SMS')
+	def test_failed_resend_keeps_the_current_otp_available(self, sms_class):
+		sms_class.return_value.send_code.side_effect = [
+			SimpleNamespace(status_code=200),
+			SimpleNamespace(status_code=500),
+		]
+		self.client.post(reverse('login'), {'phone_number': self.phone})
+		first_code = sms_class.return_value.send_code.call_args.args[1]
+		first_otp_id = self.client.session['otp_id']
+		session = self.client.session
+		session['otp_resend_at'] = 0
+		session.save()
+
+		response = self.client.post(reverse('login'), {'action': 'resend'})
+
+		self.assertRedirects(response, reverse('login'))
+		self.assertEqual(self.client.session['otp_id'], first_otp_id)
+		self.assertTrue(OTPCode.objects.filter(pk=first_otp_id).exists())
+		self.assertEqual(OTPCode.objects.count(), 1)
+
+		response = self.client.post(reverse('login'), {'code': first_code})
+		self.assertRedirects(response, reverse('dashboard'))
 
 	@patch('account.views.SMS')
 	def test_failed_sms_does_not_start_verification(self, sms_class):

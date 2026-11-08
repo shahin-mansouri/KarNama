@@ -219,6 +219,68 @@
     text-align: center;
   }
 
+  .otp-resend {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border: 1px solid color-mix(in srgb, var(--primary) 14%, var(--border));
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--primary) 4%, var(--card-bg));
+    text-align: center;
+  }
+
+  .otp-resend__timer {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text-light);
+    font-size: 0.88rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .otp-resend__progress {
+    height: 3px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 12%, white);
+  }
+
+  .otp-resend__progress-bar {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--primary), #818cf8);
+    transition: width 0.9s linear;
+  }
+
+  .otp-resend__button {
+    border: 0;
+    padding: 7px 12px;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--primary-dark);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .otp-resend__button:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--primary) 10%, white);
+    transform: translateY(-1px);
+  }
+
+  .otp-resend__button:disabled {
+    color: var(--text-light);
+    cursor: wait;
+    opacity: 0.65;
+  }
+
+  .otp-resend.is-ready .otp-resend__button {
+    animation: resend-ready 0.45s ease both;
+  }
+
   @keyframes login-enter {
     from {
       opacity: 0;
@@ -232,6 +294,11 @@
 
   @keyframes login-spin {
     to { transform: rotate(360deg); }
+  }
+
+  @keyframes resend-ready {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @media (max-width: 767px) {
@@ -267,7 +334,10 @@
   @media (prefers-reduced-motion: reduce) {
     .login-page,
     .otp-submit,
-    .otp-submit:disabled::before {
+    .otp-submit:disabled::before,
+    .otp-resend__button,
+    .otp-resend.is-ready .otp-resend__button,
+    .otp-resend__progress-bar {
       animation: none;
       transition: none;
     }
@@ -276,7 +346,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="login-page" data-step="{{ otp_step }}">
+<div class="login-page" data-step="{{ otp_step }}" data-resend-at="{{ otp_resend_at }}">
   <span class="login-page__orb login-page__orb--one" aria-hidden="true"></span>
   <span class="login-page__orb login-page__orb--two" aria-hidden="true"></span>
   <div class="otp-card">
@@ -291,12 +361,65 @@
       {% for field in form %}<div class="otp-field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endfor %}
       <button class="otp-submit" type="submit">{% if otp_step == 'verify' %}ورود{% else %}ارسال کد تأیید{% endif %}</button>
     </form>
+    {% if otp_step == 'verify' %}
+      <div class="otp-resend{% if otp_resend_remaining == 0 %} is-ready{% endif %}" id="otp-resend">
+        <span class="otp-resend__timer" id="otp-countdown" role="timer" aria-live="off">
+          {% if otp_resend_remaining > 0 %}ارسال مجدد تا ۰۲:۰۰{% else %}امکان درخواست کد جدید فراهم است{% endif %}
+        </span>
+        <div class="otp-resend__progress" aria-hidden="true">
+          <span class="otp-resend__progress-bar" id="otp-progress"></span>
+        </div>
+        <form method="post" id="resend-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="resend">
+          <button class="otp-resend__button" id="resend-button" type="submit"{% if otp_resend_remaining > 0 %} disabled{% endif %}>ارسال مجدد کد</button>
+        </form>
+      </div>
+    {% endif %}
     <script>
       document.getElementById('otp-form').addEventListener('submit', function () {
         const submitButton = this.querySelector('.otp-submit');
         submitButton.disabled = true;
         submitButton.textContent = 'در حال ارسال...';
       });
+
+      const loginPage = document.querySelector('.login-page');
+      if (loginPage.dataset.step === 'verify') {
+        document.getElementById('resend-form').addEventListener('submit', function () {
+          const resendButton = this.querySelector('.otp-resend__button');
+          resendButton.disabled = true;
+          resendButton.textContent = 'در حال ارسال...';
+        });
+
+        const countdown = document.getElementById('otp-countdown');
+        const resendButton = document.getElementById('resend-button');
+        const resendPanel = document.getElementById('otp-resend');
+        const progress = document.getElementById('otp-progress');
+        const resendAt = Number(loginPage.dataset.resendAt);
+        const toPersianDigits = value => value.replace(/\d/g, digit => '۰۱۲۳۴۵۶۷۸۹'[digit]);
+        let resendTimer = null;
+
+        function updateResendTimer() {
+          const remaining = Math.max(0, Math.ceil(resendAt - Date.now() / 1000));
+          const minutes = String(Math.floor(remaining / 60)).padStart(2, '0');
+          const seconds = String(remaining % 60).padStart(2, '0');
+          progress.style.width = `${Math.min(100, remaining / 120 * 100)}%`;
+
+          if (remaining > 0) {
+            countdown.textContent = `ارسال مجدد تا ${toPersianDigits(minutes)}:${toPersianDigits(seconds)}`;
+            return;
+          }
+
+          countdown.textContent = 'امکان درخواست کد جدید فراهم است';
+          countdown.setAttribute('aria-live', 'polite');
+          resendButton.disabled = false;
+          resendPanel.classList.add('is-ready');
+          if (resendTimer) window.clearInterval(resendTimer);
+        }
+
+        updateResendTimer();
+        if (resendButton.disabled) resendTimer = window.setInterval(updateResendTimer, 1000);
+      }
     </script>
     <p class="otp-hint">حساب جدید؟ بعد از تأیید شماره، اطلاعات پروفایل خود را مرحله‌به‌مرحله تکمیل می‌کنید.</p>
   </div>

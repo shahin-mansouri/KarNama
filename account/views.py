@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.generic import CreateView
 from django.urls import reverse, reverse_lazy
 
@@ -18,11 +19,46 @@ def normalize_phone(value):
 	return value.translate(str.maketrans('۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩', '01234567890123456789')).replace(' ', '').replace('-', '')
 
 
+def _resend_otp(request):
+	resend_at = request.session.get('otp_resend_at', 0)
+	if timezone.now().timestamp() < resend_at:
+		messages.error(request, 'لطفاً تا پایان زمان‌سنج برای درخواست کد جدید صبر کنید.')
+		return redirect('login')
+
+	otp = OTPCode.objects.filter(
+		pk=request.session.get('otp_id'),
+		session_key=request.session.session_key,
+	).first()
+	if not otp:
+		for key in ('otp_id', 'otp_step', 'otp_phone', 'otp_resend_at'):
+			request.session.pop(key, None)
+		messages.error(request, 'درخواست تأیید شما پیدا نشد. لطفاً شماره تماس خود را دوباره وارد کنید.')
+		return redirect('login')
+
+	new_otp, code = OTPCode.issue(otp.phone_number, request.session.session_key)
+	try:
+		response = SMS().send_code(otp.phone_number, code)
+		if not 200 <= response.status_code < 300:
+			raise RuntimeError(f'SMS service returned HTTP {response.status_code}')
+	except Exception:
+		new_otp.delete()
+		messages.error(request, 'ارسال دوباره کد تأیید انجام نشد. لطفاً دوباره تلاش کنید.')
+		return redirect('login')
+
+	request.session['otp_id'] = new_otp.pk
+	request.session['otp_phone'] = otp.phone_number
+	request.session['otp_resend_at'] = int(timezone.now().timestamp()) + 120
+	messages.success(request, 'کد تأیید جدید ارسال شد.')
+	return redirect('login')
+
+
 def phone_login(request):
 	if request.user.is_authenticated:
 		return redirect('dashboard')
 	step = request.session.get('otp_step', 'phone')
 	if request.method == 'POST':
+		if step == 'verify' and request.POST.get('action') == 'resend':
+			return _resend_otp(request)
 		if step == 'phone':
 			form = PhoneForm(request.POST)
 			if form.is_valid():
@@ -39,6 +75,8 @@ def phone_login(request):
 				else:
 					request.session['otp_id'] = otp.pk
 					request.session['otp_step'] = 'verify'
+					request.session['otp_phone'] = phone
+					request.session['otp_resend_at'] = int(timezone.now().timestamp()) + 120
 					messages.success(request, 'کد تأیید ارسال شد.')
 					return redirect('login')
 		else:
@@ -48,7 +86,7 @@ def phone_login(request):
 				if otp and otp.verify(form.cleaned_data['code'], request.session.session_key):
 					phone = otp.phone_number
 					user = UserCustom.objects.filter(phone_number=phone).first()
-					for key in ('otp_id', 'otp_step'):
+					for key in ('otp_id', 'otp_step', 'otp_phone', 'otp_resend_at'):
 						request.session.pop(key, None)
 					if user:
 						login(request, user)
@@ -58,7 +96,21 @@ def phone_login(request):
 				form.add_error('code', 'کد واردشده نادرست یا منقضی شده است.')
 	else:
 		form = OTPForm() if step == 'verify' else PhoneForm()
-	return render(request, 'registration/login.html', {'form': form, 'otp_step': step, 'otp_phone': request.session.get('otp_phone')})
+	otp_phone = request.session.get('otp_phone')
+	if step == 'verify' and not otp_phone:
+		otp = OTPCode.objects.filter(pk=request.session.get('otp_id')).first()
+		if otp:
+			otp_phone = otp.phone_number
+			request.session['otp_phone'] = otp_phone
+	resend_at = request.session.get('otp_resend_at', 0)
+	resend_remaining = max(0, int(resend_at - timezone.now().timestamp()))
+	return render(request, 'registration/login.html', {
+		'form': form,
+		'otp_step': step,
+		'otp_phone': otp_phone,
+		'otp_resend_at': resend_at,
+		'otp_resend_remaining': resend_remaining,
+	})
 
 
 def onboarding(request):

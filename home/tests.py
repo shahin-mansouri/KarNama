@@ -246,6 +246,16 @@ class ResumeDiscoveryTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.context['successful_people'][0], self.admin)
 
+	def test_home_and_about_link_to_bale_channel(self):
+		for page in ('home', 'about'):
+			with self.subTest(page=page):
+				response = self.client.get(reverse(page))
+
+				self.assertEqual(response.status_code, 200)
+				self.assertContains(response, 'href="https://ble.ir/karnamma"')
+				self.assertContains(response, 'دنبال‌کردن کانال بله' if page == 'home' else 'مقالات کارنما در بله')
+				self.assertContains(response, '<svg', count=2 if page == 'home' else 1)
+
 	def test_resume_bank_search_matches_skills(self):
 		response = self.client.get(reverse('resume_bank'), {'q': 'Python'})
 
